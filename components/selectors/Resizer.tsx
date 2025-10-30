@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNode, useEditor } from '@craftjs/core';
 import cx from 'classnames';
-import { debounce } from 'debounce';
 import { Resizable } from 're-resizable';
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { styled } from 'styled-components';
@@ -11,6 +11,7 @@ import {
   percentToPx,
   getElementDimensions,
 } from '../../utils/numToMeasurement';
+import { debounce } from '@mui/material';
 
 const Indicators = styled.div<{ $bound?: 'row' | 'column' }>`
   position: absolute;
@@ -111,10 +112,11 @@ export const Resizer = ({ propKey, children, ...props }: any) => {
   });
 
   const resizable = useRef<Resizable>(null);
-  const isResizing = useRef<Boolean>(false);
+  const isResizing = useRef<boolean>(false);
   const editingDimensions = useRef<any>(null);
   const nodeDimensions = useRef(null);
-  nodeDimensions.current = { width: nodeWidth, height: nodeHeight };
+  // @ts-ignore
+  nodeDimensions?.current = { width: nodeWidth, height: nodeHeight };
 
   /**
    * Using an internal value to ensure the width/height set in the node is converted to px

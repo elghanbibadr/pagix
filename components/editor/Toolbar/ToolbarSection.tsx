@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNode } from '@craftjs/core';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Grid2 as Grid,
+  Grid,
 } from '@mui/material';
 import React from 'react';
 

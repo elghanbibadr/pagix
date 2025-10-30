@@ -5,7 +5,7 @@ import { MoreVertical, Edit2, Trash2, Copy } from "lucide-react"
 interface PageCardProps {
   title: string
   date: string
-  status: "Published" | "Draft"
+  status:string
 }
 
 export default function PageCard({ title, date, status }: PageCardProps) {
