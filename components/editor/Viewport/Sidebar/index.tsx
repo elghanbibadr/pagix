@@ -5,8 +5,8 @@ import { styled } from 'styled-components';
 
 import { SidebarItem } from './SidebarItem';
 
-import CustomizeIcon from '../../../../public/icons/customize.svg';
-import LayerIcon from '../../../../public/icons/layers.svg';
+import CustomizeIcon from '@/public/icons/customize.svg';
+import LayerIcon from '@/public/icons/layers.svg';
 import { Toolbar } from '../../Toolbar';
 
 export const SidebarDiv = styled.div<{ $enabled: boolean }>`

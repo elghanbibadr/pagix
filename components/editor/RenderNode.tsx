@@ -1,12 +1,9 @@
 import { useNode, useEditor } from '@craftjs/core';
 import { ROOT_NODE } from '@craftjs/utils';
+import Image from 'next/image';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { styled } from 'styled-components';
-
-import ArrowUp from '../../public/icons/arrow-up.svg';
-import Delete from '../../public/icons/delete.svg';
-import Move from '../../public/icons/move.svg';
 
 const IndicatorDiv = styled.div`
   height: 30px;
@@ -14,8 +11,8 @@ const IndicatorDiv = styled.div`
   font-size: 12px;
   line-height: 12px;
 
-  svg {
-    fill: #fff;
+  img {
+    filter: brightness(0) invert(1);
     width: 15px;
     height: 15px;
   }
@@ -121,7 +118,12 @@ export const RenderNode = ({ render }) => {
                     drag(dom);
                   }}
                 >
-                  <Move viewBox="-4 -3 24 24" />
+                  <Image
+                    src="/icons/move.svg"
+                    alt="Move"
+                    width={15}
+                    height={15}
+                  />
                 </Btn>
               ) : null}
               {id !== ROOT_NODE && (
@@ -131,7 +133,12 @@ export const RenderNode = ({ render }) => {
                     actions.selectNode(parent);
                   }}
                 >
-                  <ArrowUp viewBox="-4 -1 24 24" />
+                  <Image
+                    src="/icons/arrow-up.svg"
+                    alt="Arrow Up"
+                    width={15}
+                    height={15}
+                  />
                 </Btn>
               )}
               {deletable ? (
@@ -142,7 +149,12 @@ export const RenderNode = ({ render }) => {
                     actions.delete(id);
                   }}
                 >
-                  <Delete viewBox="-4 -3 24 24" />
+                  <Image
+                    src="/icons/delete.svg"
+                    alt="Delete"
+                    width={15}
+                    height={15}
+                  />
                 </Btn>
               ) : null}
             </IndicatorDiv>,

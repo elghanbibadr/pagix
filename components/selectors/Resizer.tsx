@@ -114,10 +114,11 @@ export const Resizer = ({ propKey, children, ...props }: any) => {
   const resizable = useRef<Resizable>(null);
   const isResizing = useRef<boolean>(false);
   const editingDimensions = useRef<any>(null);
-  const nodeDimensions = useRef(null);
-  // @ts-ignore
-  nodeDimensions?.current = { width: nodeWidth, height: nodeHeight };
+const nodeDimensions = useRef({ width: nodeWidth, height: nodeHeight });
 
+useEffect(() => {
+  nodeDimensions.current = { width: nodeWidth, height: nodeHeight };
+}, [nodeWidth, nodeHeight]);
   /**
    * Using an internal value to ensure the width/height set in the node is converted to px
    * because for some reason the <re-resizable /> library does not work well with percentages.

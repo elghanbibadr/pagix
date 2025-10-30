@@ -1,13 +1,9 @@
 import { useEditor } from '@craftjs/core';
 import { Tooltip } from '@mui/material';
 import cx from 'classnames';
+import Image from 'next/image';
 import React from 'react';
 import { styled } from 'styled-components';
-
-import Checkmark from '../../../public/icons/check.svg';
-import Customize from '../../../public/icons/customize.svg';
-import RedoSvg from '../../../public/icons/toolbox/redo.svg';
-import UndoSvg from '../../../public/icons/toolbox/undo.svg';
 
 const HeaderDiv = styled.div`
   width: 100%;
@@ -26,11 +22,11 @@ const Btn = styled.a`
   border-radius: 3px;
   color: #fff;
   font-size: 13px;
-  svg {
+  img {
     margin-right: 6px;
     width: 12px;
     height: 12px;
-    fill: #fff;
+    filter: brightness(0) invert(1);
     opacity: 0.9;
   }
 `;
@@ -38,10 +34,10 @@ const Btn = styled.a`
 const Item = styled.a<{ disabled?: boolean }>`
   margin-right: 10px;
   cursor: pointer;
-  svg {
+  img {
     width: 20px;
     height: 20px;
-    fill: #707070;
+    filter: invert(44%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(96%) contrast(92%);
   }
   ${(props) =>
     props.disabled &&
@@ -119,12 +115,22 @@ export const Header = () => {
           <div className="flex-1 flex">
             <Tooltip title="Undo" placement="bottom">
               <Item disabled={!canUndo} onClick={() => actions.history.undo()}>
-                <UndoSvg />
+                <Image
+                  src="/icons/toolbox/undo.svg"
+                  alt="Undo"
+                  width={20}
+                  height={20}
+                />
               </Item>
             </Tooltip>
             <Tooltip title="Redo" placement="bottom">
               <Item disabled={!canRedo} onClick={() => actions.history.redo()}>
-                <RedoSvg />
+                <Image
+                  src="/icons/toolbox/redo.svg"
+                  alt="Redo"
+                  width={20}
+                  height={20}
+                />
               </Item>
             </Tooltip>
           </div>
@@ -143,9 +149,19 @@ export const Header = () => {
             }}
           >
             {enabled ? (
-              <Checkmark viewBox="-3 -3 20 20" />
+              <Image
+                src="/icons/check.svg"
+                alt="Checkmark"
+                width={12}
+                height={12}
+              />
             ) : (
-              <Customize viewBox="2 0 16 16" />
+              <Image
+                src="/icons/customize.svg"
+                alt="Customize"
+                width={12}
+                height={12}
+              />
             )}
             {enabled ? 'Finish Editing' : 'Edit'}
           </Btn>

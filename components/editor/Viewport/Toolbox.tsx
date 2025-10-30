@@ -1,12 +1,9 @@
 import { Element, useEditor } from '@craftjs/core';
 import { Tooltip } from '@mui/material';
+import Image from 'next/image';
 import React from 'react';
 import { styled } from 'styled-components';
 
-import ButtonSvg from '../../../public/icons/toolbox/button.svg';
-import SquareSvg from '../../../public/icons/toolbox/rectangle.svg';
-import TypeSvg from '../../../public/icons/toolbox/text.svg';
-import YoutubeSvg from '../../../public/icons/toolbox/video-line.svg';
 import { Button } from '../../selectors/Button';
 import { Container } from '../../selectors/Container';
 import { Text } from '../../selectors/Text';
@@ -24,10 +21,10 @@ const Item = styled.a<{ $move?: boolean }>`
   justify-content: center;
   flex-direction: column;
 
-  svg {
+  img {
     width: 28px;
     height: 28px;
-    fill: #707070;
+    filter: invert(44%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(96%) contrast(92%);
   }
   ${(props) =>
     props.$move &&
@@ -67,7 +64,12 @@ export const Toolbox = () => {
         >
           <Tooltip title="Container" placement="right">
             <Item $move>
-              <SquareSvg viewBox="-3 -3 24 24" />
+              <Image
+                src="/icons/toolbox/rectangle.svg"
+                alt="Container"
+                width={28}
+                height={28}
+              />
             </Item>
           </Tooltip>
         </div>
@@ -81,7 +83,12 @@ export const Toolbox = () => {
         >
           <Tooltip title="Text" placement="right">
             <Item $move>
-              <TypeSvg viewBox="-3 -3 28 28" />
+              <Image
+                src="/icons/toolbox/text.svg"
+                alt="Text"
+                width={28}
+                height={28}
+              />
             </Item>
           </Tooltip>
         </div>
@@ -92,7 +99,12 @@ export const Toolbox = () => {
         >
           <Tooltip title="Button" placement="right">
             <Item $move>
-              <ButtonSvg viewBox="-4 -3 24 24" />
+              <Image
+                src="/icons/toolbox/button.svg"
+                alt="Button"
+                width={28}
+                height={28}
+              />
             </Item>
           </Tooltip>
         </div>
@@ -103,7 +115,12 @@ export const Toolbox = () => {
         >
           <Tooltip title="Video" placement="right">
             <Item $move>
-              <YoutubeSvg viewBox="-3 -3 28 28" />
+              <Image
+                src="/icons/toolbox/video-line.svg"
+                alt="Video"
+                width={28}
+                height={28}
+              />
             </Item>
           </Tooltip>
         </div>

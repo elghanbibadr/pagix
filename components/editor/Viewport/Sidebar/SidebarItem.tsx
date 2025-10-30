@@ -1,8 +1,7 @@
 import classNames from 'classnames';
+import Image from 'next/image';
 import React from 'react';
 import { styled } from 'styled-components';
-
-import Arrow from '../../../../public/icons/arrow.svg';
 
 const SidebarItemDiv = styled.div<{ $visible?: boolean; $height?: string }>`
   height: ${(props) =>
@@ -20,7 +19,7 @@ const SidebarItemDiv = styled.div<{ $visible?: boolean; $height?: string }>`
 
 const Chevron = styled.a<{ $visible: boolean }>`
   transform: rotate(${(props) => (props.$visible ? 180 : 0)}deg);
-  svg {
+  img {
     width: 10px;
     height: 10px;
   }
@@ -39,8 +38,8 @@ export type SidebarItemProps = {
 const HeaderDiv = styled.div`
   color: #615c5c;
   height: 45px;
-  svg {
-    fill: #707070;
+  img {
+    filter: invert(44%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(96%) contrast(92%);
   }
 `;
 
@@ -68,11 +67,22 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         }`}
       >
         <div className="flex-1 flex items-center">
-          {React.createElement(icon, { className: 'w-4 h-4 mr-2' })}
+          <Image
+            src={icon}
+            alt={title}
+            width={16}
+            height={16}
+            className="mr-2"
+          />
           <h2 className="text-xs uppercase">{title}</h2>
         </div>
         <Chevron $visible={visible}>
-          <Arrow viewBox="-2 -1 12 12" />
+          <Image
+            src="/icons/arrow.svg"
+            alt="Arrow"
+            width={10}
+            height={10}
+          />
         </Chevron>
       </HeaderDiv>
       {visible ? (
