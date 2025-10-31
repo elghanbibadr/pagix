@@ -166,7 +166,6 @@ export const Sidebar = () => {
             <Layers expandRootOnLoad={true} />
           </div>
         </SidebarItem>
-        <Carbonads />
       </div>
     </SidebarDiv>
   );
