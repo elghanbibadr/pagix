@@ -1,7 +1,9 @@
+import { Button } from '@/components/ui/button';
 import { useEditor } from '@craftjs/core';
 import { Tooltip } from '@mui/material';
 import cx from 'classnames';
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import { styled } from 'styled-components';
 
@@ -166,6 +168,7 @@ export const Header = () => {
             {enabled ? 'Finish Editing' : 'Edit'}
           </Btn>
           <Btn onClick={handlePreview} className='bg-black cursor-pointer text-white'>Preview</Btn>
+          <Link href="/dashboard"><Button> Go back </Button></Link> 
         </div>
       </div>
     </HeaderDiv>
