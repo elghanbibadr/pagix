@@ -76,7 +76,7 @@ export default function Home() {
                     <Text
                       fontSize="23"
                       fontWeight="400"
-                      text="Craft.js is a React framework for building powerful &amp; feature-rich drag-n-drop page editors."
+                      text="This is a title."
                     ></Text>
                   </Element>
                   <Element
@@ -90,7 +90,9 @@ export default function Home() {
                     <Text
                       fontSize="14"
                       fontWeight="400"
-                      text="Everything you see here, including the editor, itself is made of React components. Craft.js comes only with the building blocks for a page editor; it provides a drag-n-drop system and handles the way user components should be rendered, updated and moved, among other things. <br /> <br /> You control the way your editor looks and behave."
+                      text="
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed suscipit, ipsum sed tincidunt faucibus, justo nunc congue libero, non lacinia felis ligula vel nulla. <br /> <br /> Aenean viverra, justo at ultricies porta, orci lectus blandit pu
+                      "
                     ></Text>
                   </Element>
                 </Element>
@@ -228,7 +230,9 @@ export default function Home() {
                         }}
                         fontSize="14"
                         fontWeight="400"
-                        text="You can define areas within your React component which users can drop other components into. <br/><br />You can even design how the component should be edited — content editable, drag to resize, have inputs on toolbars — anything really."
+                        text="
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed suscipit, ipsum sed tincidunt faucibus, justo nunc congue libero, non lacinia felis ligula vel nulla. <br /> <br /> Aenean viverra, justo at ultricies porta, orci lectus blandit pu
+                        "
                       ></Text>
                     </Element>
                   </Element>
