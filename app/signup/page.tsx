@@ -2,13 +2,17 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
+import { signup } from "../actions/actions"
 
 export default function SignupPage() {
+
+
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="mb-8">
+          <div className="mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8">
             <ArrowLeft className="w-4 h-4" />
             Back to home
@@ -34,12 +38,12 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-sm font-medium mb-2">Email</label>
-            <Input type="email" placeholder="you@example.com" className="w-full" />
+            <Input type="email" name="email" placeholder="you@example.com" className="w-full" />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">Password</label>
-            <Input type="password" placeholder="••••••••" className="w-full" />
+            <Input type="password" name="password" placeholder="••••••••" className="w-full" />
           </div>
 
           <div>
@@ -62,7 +66,7 @@ export default function SignupPage() {
             </span>
           </label>
 
-          <Button className="w-full" size="lg">
+          <Button formAction={signup} className="w-full" size="lg">
             Create Account
           </Button>
         </form>
