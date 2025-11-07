@@ -5,11 +5,10 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 
+
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -17,28 +16,63 @@ export async function login(formData: FormData) {
 
   const { error } = await supabase.auth.signInWithPassword(data)
 
+
   if (error) {
-    redirect('/error')
+    return { 
+      success: false, 
+      error: error.message 
+    }
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  // Check if phone is verified
+  // const { data: profile } = await supabase
+  //   .from('profiles')
+  //   .select('phone_verified, phone')
+  //   .eq('id', authData.user.id)
+  //   .single()
+
+ 
+
+  return { 
+    success: true, 
+    redirectTo: '/dashboard' 
+  }
 }
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
 
+  console.log("triggering sign up")
+  console.log("form data", formData)
 
-  console.log("trigeering sign up")
-  console.log("form data",formData)
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const {email,password,fullName} = {
+  const { email, password, fullName, confirmPassword } = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
     fullName: formData.get('fullName') as string,
+    confirmPassword: formData.get('confirmPassword') as string,
   }
 
+  // Validation
+  if (!email || !password || !fullName) {
+    return {
+      success: false,
+      error: 'Please fill in all required fields'
+    }
+  }
+
+  if (password !== confirmPassword) {
+    return {
+      success: false,
+      error: 'Passwords do not match'
+    }
+  }
+
+  if (password.length < 6) {
+    return {
+      success: false,
+      error: 'Password must be at least 6 characters'
+    }
+  }
 
   const { data: authData, error } = await supabase.auth.signUp({
     email,
@@ -46,24 +80,27 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: fullName,
-        // phone: phone,
       },
-      // This sends the confirmation email
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     }
   })
 
-
-  console.log("error",error)
-
-  console.log('sign up data',authData)
+  console.log("error", error)
+  console.log('sign up data', authData)
 
   if (error) {
-    redirect('/error')
+    return {
+      success: false,
+      error: error.message
+    }
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/email-confirmation')
+  
+  return {
+    success: true,
+    redirectTo: '/dashboard'
+  }
+
 }
 
 export async function logout() {

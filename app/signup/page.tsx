@@ -1,18 +1,58 @@
+// app/signup/page.tsx
+'use client'
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
 import { signup } from "../actions/actions"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function SignupPage() {
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
 
+    setLoading(true)
+
+    const formData = new FormData(e.currentTarget)
+
+    try {
+      const result = await signup(formData)
+
+      if (!result.success) {
+        toast(
+        result.error
+        )
+      } else {
+        toast(
+         "Please check your email to confirm your account.",
+        )
+        
+        // Redirect after showing toast
+        setTimeout(() => {
+          router.push(result.redirectTo )
+        }, 1000)
+      }
+    } catch (err: any) {
+      toast(
+      "An unexpected error occurred. Please try again.",
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
-          <div className="mb-8">
+        <div className="mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8">
             <ArrowLeft className="w-4 h-4" />
             Back to home
@@ -30,44 +70,77 @@ export default function SignupPage() {
         </div>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Full Name</label>
-            <Input name="fullName" type="text" placeholder="John Doe" className="w-full" />
+            <label htmlFor="fullName" className="block text-sm font-medium mb-2">
+              Full Name
+            </label>
+            <Input 
+              id="fullName"
+              name="fullName" 
+              type="text" 
+              placeholder="John Doe" 
+              className="w-full"
+              required
+              disabled={loading}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
-            <Input type="email" name="email" placeholder="you@example.com" className="w-full" />
+            <label htmlFor="email" className="block text-sm font-medium mb-2">
+              Email
+            </label>
+            <Input 
+              id="email"
+              type="email" 
+              name="email" 
+              placeholder="you@example.com" 
+              className="w-full"
+              required
+              disabled={loading}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
-            <Input type="password" name="password" placeholder="••••••••" className="w-full" />
+            <label htmlFor="password" className="block text-sm font-medium mb-2">
+              Password
+            </label>
+            <Input 
+              id="password"
+              type="password" 
+              name="password" 
+              placeholder="••••••••" 
+              className="w-full"
+              minLength={6}
+              required
+              disabled={loading}
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Confirm Password</label>
-            <Input type="password" placeholder="••••••••" className="w-full" />
+            <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+              Confirm Password
+            </label>
+            <Input 
+              id="confirmPassword"
+              type="password" 
+              name="confirmPassword"
+              placeholder="••••••••" 
+              className="w-full"
+              minLength={6}
+              required
+              disabled={loading}
+            />
           </div>
 
-          {/* Terms */}
-          <label className="flex items-start gap-2 text-sm">
-            <input type="checkbox" className="rounded mt-1" />
-            <span className="text-muted-foreground">
-              I agree to the{" "}
-              <Link href="#" className="text-primary hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="#" className="text-primary hover:underline">
-                Privacy Policy
-              </Link>
-            </span>
-          </label>
 
-          <Button formAction={signup} className="w-full" size="lg">
-            Create Account
+          <Button 
+            type="submit"
+            className="w-full" 
+            size="lg"
+            disabled={loading }
+          >
+            {loading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
 

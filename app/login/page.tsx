@@ -1,9 +1,43 @@
+"use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft } from "lucide-react"
+import { login } from "../actions/actions"
+import { useState } from "react"
+import { toast } from "sonner"
 
 export default function LoginPage() {
+   const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+
+    const formData = new FormData(e.currentTarget)
+
+    try {
+      const result = await login(formData)
+
+      if (!result.success) {
+        toast.warning("Invalid email or password. Please try again.")
+        // Show error toast
+ 
+      } else {
+        // Show success toast
+        toast.success(
+          "Login successful. Redirecting...",
+        )
+        
+      
+      }
+    } catch (err: any) {
+             toast.warning("something went wrong try later !")
+
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -26,15 +60,15 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Email</label>
-            <Input type="email" placeholder="you@example.com" className="w-full" />
+            <Input name="email" type="email" placeholder="you@example.com" className="w-full" />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">Password</label>
-            <Input type="password" placeholder="••••••••" className="w-full" />
+            <Input name="password" type="password" placeholder="••••••••" className="w-full" />
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -47,30 +81,14 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <Button className="w-full" size="lg">
+          <Button disabled={loading} className="w-full" size="lg">
             Sign In
           </Button>
         </form>
 
         {/* Divider */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-background text-muted-foreground">Or continue with</span>
-          </div>
-        </div>
-
-        {/* Social Login */}
-        <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" className="w-full bg-transparent">
-            Google
-          </Button>
-          <Button variant="outline" className="w-full bg-transparent">
-            GitHub
-          </Button>
-        </div>
+  
+ 
 
         {/* Sign Up Link */}
         <p className="text-center text-muted-foreground mt-6">
