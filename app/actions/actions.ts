@@ -33,22 +33,35 @@ export async function signup(formData: FormData) {
   console.log("form data",formData)
   // type-casting here for convenience
   // in practice, you should validate your inputs
-  const data = {
+  const {email,password,fullName} = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
+    fullName: formData.get('fullName') as string,
   }
 
-  console.log("data",data)
 
-  const { error } = await supabase.auth.signUp(data)
+  const { data: authData, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        // phone: phone,
+      },
+      // This sends the confirmation email
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    }
+  })
 
 
   console.log("error",error)
+
+  console.log('sign up data',authData)
 
   if (error) {
     redirect('/error')
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/email-confirmation')
 }

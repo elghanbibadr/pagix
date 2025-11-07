@@ -33,7 +33,7 @@ export default function SignupPage() {
         <form className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Full Name</label>
-            <Input type="text" placeholder="John Doe" className="w-full" />
+            <Input name="fullName" type="text" placeholder="John Doe" className="w-full" />
           </div>
 
           <div>
