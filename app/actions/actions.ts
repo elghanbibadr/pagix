@@ -65,3 +65,22 @@ export async function signup(formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/email-confirmation')
 }
+
+export async function logout() {
+  const supabase = await createClient()
+
+  console.log("triggering logout")
+
+  const { error } = await supabase.auth.signOut()
+
+  console.log("logout error", error)
+
+  if (error) {
+    console.error("Logout failed:", error)
+    redirect('/error')
+  }
+
+  
+  // Redirect to home or login page
+  redirect('/login')
+}

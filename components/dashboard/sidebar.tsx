@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, Settings, LogOut, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { logout } from "@/app/actions/actions"
 
 export default function DashboardSidebar() {
   const pathname = usePathname()
@@ -49,7 +50,7 @@ export default function DashboardSidebar() {
           <p className="text-sm font-medium">John Doe</p>
           <p className="text-xs text-muted-foreground">john@example.com</p>
         </div>
-        <Button variant="ghost" className="w-full justify-start gap-3 text-destructive hover:text-destructive">
+        <Button onClick={logout} variant="ghost" className="w-full justify-start gap-3 text-destructive hover:text-destructive">
           <LogOut className="w-5 h-5" />
           Logout
         </Button>
