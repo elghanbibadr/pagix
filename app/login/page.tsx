@@ -3,12 +3,14 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft } from "lucide-react"
-import { login } from "../actions/actions"
+import { login, loginWithGoogle } from "../actions/actions"
 import { useState } from "react"
 import { toast } from "sonner"
 
 export default function LoginPage() {
    const [loading, setLoading] = useState(false)
+     const [googleLoading, setGoogleLoading] = useState(false)
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -38,6 +40,17 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
+
+    const handleGoogleLogin = async () => {
+    setGoogleLoading(true)
+    try {
+      await loginWithGoogle()
+    } catch (err: any) {
+      toast.error("Failed to login with Google. Please try again.")
+      setGoogleLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -63,12 +76,12 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Email</label>
-            <Input name="email" type="email" placeholder="you@example.com" className="w-full" />
+            <Input required name="email" type="email" placeholder="you@example.com" className="w-full" />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">Password</label>
-            <Input name="password" type="password" placeholder="••••••••" className="w-full" />
+            <Input required name="password" type="password" placeholder="••••••••" className="w-full" />
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -87,7 +100,29 @@ export default function LoginPage() {
         </form>
 
         {/* Divider */}
-  
+    {/* Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-background text-muted-foreground">Or continue with</span>
+          </div>
+        </div>
+
+        {/* Social Login */}
+        <div className="">
+          <Button
+            variant="outline"
+            className="w-full bg-transparent"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+            type="button"
+          >
+            {googleLoading ? "Connecting..." : "Google"}
+          </Button>
+       
+        </div>
  
 
         {/* Sign Up Link */}

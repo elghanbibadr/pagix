@@ -100,6 +100,20 @@ export default function SignupPage() {
               disabled={loading}
             />
           </div>
+            <div>
+            <label htmlFor="phone" className="block text-sm font-medium mb-2">
+              Phone
+            </label>
+            <Input 
+              id="phone"
+              type="phone" 
+              name="phone" 
+              placeholder="12345678" 
+              className="w-full"
+              required
+              disabled={loading}
+            />
+          </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-2">
