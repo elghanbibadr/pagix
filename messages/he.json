@@ -1,0 +1,180 @@
+{
+  "nav": {
+    "brand": "Pagix",
+    "signIn": "התחברות",
+    "getStarted": "התחל עכשיו"
+  },
+  "hero": {
+    "badge": "בונה אתרים מבוסס בינה מלאכותית",
+    "title": "בנה אתרים בלי לכתוב קוד",
+    "subtitle": "צור אתרים מדהימים ורספונסיביים בעזרת עורך גרירה ושחרור. ללא צורך בקוד. הפעלה תוך דקות ספורות.",
+    "cta": {
+      "primary": "התחל לבנות בחינם",
+      "secondary": "צפה בהדגמה"
+    }
+  },
+  "features": {
+    "title": "תכונות עוצמתיות",
+    "subtitle": "כל מה שאתה צריך כדי ליצור אתרים מקצועיים",
+    "items": [
+      {
+        "title": "עורך גרירה ושחרור",
+        "description": "ממשק אינטואיטיבי לבניית עמודים בלי לגעת בקוד"
+      },
+      {
+        "title": "מערכת עיצוב",
+        "description": "רכיבים ותבניות מוכנים לשימוש מיידי"
+      },
+      {
+        "title": "ייצוא קוד",
+        "description": "ייצא קוד HTML, CSS ו-JavaScript נקי ומוכן לפרודקשן"
+      },
+      {
+        "title": "יצירת תוכן עם בינה מלאכותית",
+        "description": "תן לבינה מלאכותית לעזור ביצירת תוכן והצעות עיצוב"
+      },
+      {
+        "title": "שיתוף פעולה",
+        "description": "עבוד עם הצוות שלך בזמן אמת על פרויקטים"
+      },
+      {
+        "title": "עיצוב רספונסיבי",
+        "description": "מותאם אוטומטית לכל המכשירים וגדלי המסכים"
+      }
+    ]
+  },
+  "cta": {
+    "title": "מוכן להתחיל לבנות?",
+    "subtitle": "הצטרף לאלפי יוצרים שבונים אתרים מדהימים עם Pagix",
+    "button": "התחל בחינם"
+  },
+  "footer": {
+    "brand": "Pagix",
+    "copyright": "© 2025 Pagix. כל הזכויות שמורות."
+  },
+  "dashboard": {
+    "welcome": {
+      "title": "ברוך שובך!",
+      "subtitle": "צור דף חדש או המשך לערוך את הפרויקטים הקיימים שלך"
+    },
+    "quickActions": {
+      "createBlank": "צור דף ריק",
+      "chooseTemplate": "בחר תבנית"
+    },
+    "myPages": {
+      "title": "הדפים שלי",
+      "searchPlaceholder": "חפש דפים...",
+      "statuses": {
+        "published": "פורסם",
+        "draft": "טיוטה"
+      }
+    }
+   
+  },
+   "templates": {
+    "portfolio": "פורטפוליו",
+    "ecommerce": "מסחר אלקטרוני",
+    "blog": "בלוג",
+    "saas": "תוכנה כשירות (SaaS)",
+    "agency": "סוכנות",
+    "restaurant": "מסעדה",
+    "useTemplate": "השתמש בתבנית"
+  },
+  "sidebar": {
+    "logo": "פאג'יקס",
+    "dashboard": "לוח בקרה",
+    "createPage": "צור עמוד",
+    "settings": "הגדרות",
+    "logout": "התנתק"
+  },
+  "signup": {
+    "backHome": "חזרה לדף הבית",
+    "logo": "פאג'יקס",
+    "title": "צור חשבון",
+    "subtitle": "התחל לבנות אתרי אינטרנט מדהימים כבר היום",
+    "fullName": "שם מלא",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "password": "סיסמה",
+    "confirmPassword": "אשר סיסמה",
+    "fullNamePlaceholder": "יוסי כהן",
+    "emailPlaceholder": "you@example.com",
+    "phonePlaceholder": "12345678",
+    "passwordPlaceholder": "••••••••",
+    "confirmPasswordPlaceholder": "••••••••",
+    "createAccount": "צור חשבון",
+    "creatingAccount": "יוצר חשבון...",
+    "benefitsTitle": "מה תקבל:",
+    "benefit1": "פרויקטים ללא הגבלה",
+    "benefit2": "עיצוב מבוסס בינה מלאכותית",
+    "benefit3": "ייצוא קוד",
+    "alreadyHaveAccount": "כבר יש לך חשבון?",
+    "signIn": "התחבר",
+    "emailConfirm": "אנא בדוק את האימייל שלך כדי לאשר את החשבון.",
+    "error": "אירעה שגיאה בלתי צפויה. נסה שוב."
+  },
+   "login": {
+    "back": "חזרה לדף הבית",
+    "title": "ברוך שובך",
+    "subtitle": "היכנס לחשבון שלך כדי להמשיך לבנות",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "remember": "זכור אותי",
+    "forgot": "שכחת סיסמה?",
+    "signin": "התחברות",
+    "signinLoading": "מתחבר...",
+    "divider": "או המשך עם",
+    "google": "המשך עם Google",
+    "googleLoading": "מתחבר...",
+    "noAccount": "אין לך חשבון?",
+    "signup": "הרשמה",
+    "invalid": "אימייל או סיסמה שגויים.",
+    "success": "התחברת בהצלחה. מעביר...",
+    "error": "משהו השתבש. נסה שוב מאוחר יותר!"
+  },
+   "forgotPassword": {
+    "backToLogin": "חזרה להתחברות",
+    "title": "שכחת סיסמה?",
+    "description": "אין בעיה. הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה.",
+    "emailLabel": "כתובת אימייל",
+    "emailPlaceholder": "example@example.com",
+    "sendButton": "שלח קישור לאיפוס",
+    "sending": "שולח...",
+    "rememberPassword": "זוכר את הסיסמה שלך?",
+    "signIn": "התחבר",
+    "errorRequired": "אנא הזן את כתובת האימייל שלך",
+    "errorInvalid": "אנא הזן כתובת אימייל תקינה",
+    "successTitle": "בדוק את האימייל שלך",
+    "successDescription": "שלחנו קישור לאיפוס סיסמה אל",
+    "successInstructions": "לחץ על הקישור באימייל כדי לאפס את הסיסמה שלך.",
+    "noEmail": "לא קיבלת אימייל? בדוק את תיקיית הספאם שלך או נסה שוב עם אימייל אחר.",
+    "tryAnother": "נסה אימייל אחר"
+  },
+   "resetPassword": {
+    "backToLogin": "חזרה להתחברות",
+    "title": "הגדר סיסמה חדשה",
+    "description": "הזן סיסמה חדשה לחשבון שלך. וודא שהיא חזקה וייחודית.",
+    "newPasswordLabel": "סיסמה חדשה",
+    "newPasswordPlaceholder": "הזן את הסיסמה החדשה שלך",
+    "confirmPasswordLabel": "אימות סיסמה",
+    "confirmPasswordPlaceholder": "אמת את הסיסמה החדשה שלך",
+    "showPassword": "הצג סיסמה",
+    "hidePassword": "הסתר סיסמה",
+    "resetButton": "אפס סיסמה",
+    "resetting": "מאפס...",
+    "requirementsTitle": "דרישות סיסמה:",
+    "requirement1": "• לפחות 8 תווים",
+    "requirement2": "• מכיל אות גדולה באנגלית (A-Z)",
+    "requirement3": "• מכיל אות קטנה באנגלית (a-z)",
+    "requirement4": "• מכיל מספר (0-9)",
+    "errorAllFields": "אנא מלא את כל השדות",
+    "errorTooShort": "הסיסמה חייבת להכיל לפחות 8 תווים",
+    "errorNoUppercase": "הסיסמה חייבת להכיל לפחות אות גדולה אחת",
+    "errorNoLowercase": "הסיסמה חייבת להכיל לפחות אות קטנה אחת",
+    "errorNoNumber": "הסיסמה חייבת להכיל לפחות מספר אחד",
+    "errorNoMatch": "הסיסמאות אינן תואמות",
+    "successTitle": "איפוס הסיסמה הצליח",
+    "successDescription": "הסיסמה שלך אופסה בהצלחה. כעת תוכל להתחבר עם הסיסמה החדשה שלך.",
+    "goToDashboard": "עבור לדשבורד"
+  }
+}

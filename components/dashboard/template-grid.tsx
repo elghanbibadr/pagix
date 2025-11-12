@@ -1,16 +1,19 @@
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-const templates = [
-  { id: 1, name: "Portfolio", icon: "🎨" },
-  { id: 2, name: "E-Commerce", icon: "🛍️" },
-  { id: 3, name: "Blog", icon: "📝" },
-  { id: 4, name: "SaaS", icon: "💼" },
-  { id: 5, name: "Agency", icon: "🚀" },
-  { id: 6, name: "Restaurant", icon: "🍽️" },
-]
-
 export default function TemplateGrid() {
+  const t = useTranslations("templates")
+
+  const templates = [
+    { id: 1, name: t("portfolio"), icon: "🎨" },
+    { id: 2, name: t("ecommerce"), icon: "🛍️" },
+    { id: 3, name: t("blog"), icon: "📝" },
+    { id: 4, name: t("saas"), icon: "💼" },
+    { id: 5, name: t("agency"), icon: "🚀" },
+    { id: 6, name: t("restaurant"), icon: "🍽️" },
+  ]
+
   return (
     <div className="grid md:grid-cols-3 gap-6">
       {templates.map((template) => (
@@ -22,7 +25,7 @@ export default function TemplateGrid() {
             <div className="p-4">
               <h3 className="font-semibold mb-3">{template.name}</h3>
               <Button className="w-full" size="sm">
-                Use Template
+                {t("useTemplate")}
               </Button>
             </div>
           </div>

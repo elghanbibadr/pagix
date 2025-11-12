@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 
 const SMS_API_KEY = process.env.SMS_019_API_KEY!
-const SMS_API_URL = 'https://019sms.co.il/api'
+// const SMS_API_URL = 'https://019sms.co.il/api' // Production
+const SMS_API_URL = 'https://019sms.co.il/api/test' // Test
 const SMS_USERNAME = process.env.SMS_019_USERNAME!
 const SMS_FROM_NAME = process.env.SMS_019_FROM_NAME!
 
@@ -16,12 +18,12 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-
+  
 
     const { phone, code } = await request.json()
     console.log(' Request body:', { phone, code })
 
-    if (!phone || !code) {
+    if (!phone) {
       console.log(' Validation failed')
       return NextResponse.json(
         { error: 'Phone and code are required' },
@@ -33,17 +35,21 @@ export async function POST(request: NextRequest) {
     const formattedPhone = phone.replace(/\D/g, '')
     console.log('📞 Formatted phone:', formattedPhone)
 
+    const valid_time = 10 // minutes the code will be valid
+    const max_tries = 10
+    const text = `Your Pagix verification code is: [code]`
+
     const smsData = {
-      user: {
-        username: SMS_USERNAME
-      },
-      source: SMS_FROM_NAME,
-      destinations: [
-        {
-          phone: formattedPhone
-        }
-      ],
-      message: `Your Pagix verification code is: ${code}`
+      send_otp: {
+        user: { 
+          username: SMS_USERNAME 
+        },
+        phone: phone, // expects value like '05xxxxxxx' or '5xxxxxxx'
+        source: SMS_FROM_NAME,
+        valid_time: valid_time,
+        max_tries: max_tries,
+        text: text
+      }
     }
 
 
@@ -57,7 +63,7 @@ export async function POST(request: NextRequest) {
     })
 
     const responseText = await response.text()
-    console.log('  Response:', response)
+    console.log('  Response:', responseText)
 
     if (!response.ok) {
       console.error(' SMS API Error:', responseText)

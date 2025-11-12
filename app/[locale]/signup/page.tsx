@@ -1,48 +1,37 @@
-// app/signup/page.tsx
 'use client'
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
-import { signup } from "../actions/actions"
+import { signup } from "../../actions/actions"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useTranslations } from "next-intl"
+import Image from "next/image"
+import logo from "@/public/icons/logo.png"
 
 export default function SignupPage() {
+  const t = useTranslations("signup")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-
     setLoading(true)
-
     const formData = new FormData(e.currentTarget)
 
     try {
       const result = await signup(formData)
-
       if (!result.success) {
-        toast(
-        result.error
-        )
+        toast(result.error)
       } else {
-        toast(
-         "Please check your email to confirm your account.",
-        )
-        
-        // Redirect after showing toast
-        setTimeout(() => {
-          router.push(result.redirectTo )
-        }, 1000)
+        toast('Welcome !')
+        setTimeout(() => router.push(result.redirectTo), 1000)
       }
-    } catch (err: any) {
-      toast(
-      "An unexpected error occurred. Please try again.",
-      )
+    } catch {
+      toast(t("error"))
     } finally {
       setLoading(false)
     }
@@ -55,32 +44,29 @@ export default function SignupPage() {
         <div className="mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8">
             <ArrowLeft className="w-4 h-4" />
-            Back to home
+            {t("backHome")}
           </Link>
 
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">P</span>
-            </div>
-            <span className="text-xl font-bold">Pagix</span>
-          </div>
+       
+                <span className="text-xl font-bold">
+                            <Image className="mb-4" src={logo} alt="pagix logo" height={100} width={100} />
+                          </span>
 
-          <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-          <p className="text-muted-foreground">Start building amazing websites today</p>
+          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("subtitle")}</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="fullName" className="block text-sm font-medium mb-2">
-              Full Name
+              {t("fullName")}
             </label>
-            <Input 
+            <Input
               id="fullName"
-              name="fullName" 
-              type="text" 
-              placeholder="John Doe" 
-              className="w-full"
+              name="fullName"
+              type="text"
+              placeholder={t("fullNamePlaceholder")}
               required
               disabled={loading}
             />
@@ -88,28 +74,27 @@ export default function SignupPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-2">
-              Email
+              {t("email")}
             </label>
-            <Input 
+            <Input
               id="email"
-              type="email" 
-              name="email" 
-              placeholder="you@example.com" 
-              className="w-full"
+              name="email"
+              type="email"
+              placeholder={t("emailPlaceholder")}
               required
               disabled={loading}
             />
           </div>
-            <div>
+
+          <div>
             <label htmlFor="phone" className="block text-sm font-medium mb-2">
-              Phone
+              {t("phone")}
             </label>
-            <Input 
+            <Input
               id="phone"
-              type="phone" 
-              name="phone" 
-              placeholder="12345678" 
-              className="w-full"
+              name="phone"
+              type="phone"
+              placeholder={t("phonePlaceholder")}
               required
               disabled={loading}
             />
@@ -117,14 +102,13 @@ export default function SignupPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-2">
-              Password
+              {t("password")}
             </label>
-            <Input 
+            <Input
               id="password"
-              type="password" 
-              name="password" 
-              placeholder="••••••••" 
-              className="w-full"
+              name="password"
+              type="password"
+              placeholder={t("passwordPlaceholder")}
               minLength={6}
               required
               disabled={loading}
@@ -133,35 +117,28 @@ export default function SignupPage() {
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
-              Confirm Password
+              {t("confirmPassword")}
             </label>
-            <Input 
+            <Input
               id="confirmPassword"
-              type="password" 
               name="confirmPassword"
-              placeholder="••••••••" 
-              className="w-full"
+              type="password"
+              placeholder={t("confirmPasswordPlaceholder")}
               minLength={6}
               required
               disabled={loading}
             />
           </div>
 
-
-          <Button 
-            type="submit"
-            className="w-full" 
-            size="lg"
-            disabled={loading }
-          >
-            {loading ? 'Creating Account...' : 'Create Account'}
+          <Button type="submit" className="w-full" size="lg" disabled={loading}>
+            {loading ? t("creatingAccount") : t("createAccount")}
           </Button>
         </form>
 
         {/* Benefits */}
         <div className="mt-8 space-y-3 p-4 bg-secondary rounded-lg">
-          <p className="text-sm font-medium">What you get:</p>
-          {["Unlimited projects", "AI-powered design", "Code export"].map((benefit, i) => (
+          <p className="text-sm font-medium">{t("benefitsTitle")}</p>
+          {[t("benefit1"), t("benefit2"), t("benefit3")].map((benefit, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
               <span>{benefit}</span>
@@ -169,11 +146,11 @@ export default function SignupPage() {
           ))}
         </div>
 
-        {/* Sign In Link */}
+        {/* Sign In */}
         <p className="text-center text-muted-foreground mt-6">
-          Already have an account?{" "}
+          {t("alreadyHaveAccount")}{" "}
           <Link href="/login" className="text-primary hover:underline font-medium">
-            Sign in
+            {t("signIn")}
           </Link>
         </p>
       </div>

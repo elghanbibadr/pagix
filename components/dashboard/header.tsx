@@ -2,7 +2,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Settings, LogOut } from "lucide-react"
-
+import Image from "next/image"
+import logo from "@public/icons/logo.svg"
 export default function DashboardHeader() {
   return (
     <header className="border-b border-border">
@@ -11,7 +12,9 @@ export default function DashboardHeader() {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold">P</span>
           </div>
-          <span className="text-xl font-bold">Pagix</span>
+          <span className="text-xl font-bold">
+            <Image src={logo} alt="pagix logo" height={40} width={40} />
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">

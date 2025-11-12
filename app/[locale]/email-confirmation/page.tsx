@@ -3,11 +3,10 @@
 import { useState } from "react"
 import { Mail, CheckCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useSearchParams } from "next/navigation"
 
 export default function ConfirmEmailPage() {
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email')
+  // const searchParams = useSearchParams()
+  const email = 'test@email.com'
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
 
@@ -63,7 +62,7 @@ export default function ConfirmEmailPage() {
             <div>
               <p className="font-medium text-sm">Verify your phone</p>
               <p className="text-xs text-muted-foreground">
-                After email confirmation, you'll verify your phone number
+                After email confirmation, you&apos;ll verify your phone number
               </p>
             </div>
           </div>
@@ -107,7 +106,7 @@ export default function ConfirmEmailPage() {
           </Button>
 
           <p className="text-xs text-muted-foreground">
-            Can't find the email? Check your spam folder
+            Can&apos;t find the email? Check your spam folder
           </p>
         </div>
       </div>

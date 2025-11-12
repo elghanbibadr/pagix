@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { verifyPhoneCode, resendVerificationCode } from "../actions/actions"
+import { verifyPhoneCode, resendVerificationCode } from "../../actions/actions"
 import { toast } from "sonner"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
