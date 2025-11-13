@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getUser } from "@/app/actions/actions"
 import { UserMenu } from "./user-menu"
@@ -8,6 +7,7 @@ import { LanguageSwitcher } from "./language-switcher"
 import logo from "@/public/icons/logo.png"
 
 import Image from "next/image"
+import { Link } from "@/i18n/routing"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default  function Header({user}:{user:any}) {
