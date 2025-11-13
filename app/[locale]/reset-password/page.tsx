@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { updateUserPassword } from "../../actions/actions"
 import { useTranslations } from "next-intl"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 
 export default function ResetPasswordPage() {
   const t = useTranslations("resetPassword")

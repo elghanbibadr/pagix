@@ -1,6 +1,5 @@
 // "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -14,6 +13,7 @@ import {
 import Header from "@/components/ui/Header";
 import { getTranslations } from "next-intl/server";
 import { getUser } from "../actions/actions";
+import { Link } from "@/i18n/routing";
 
 export default async  function LandingPage() {
   const tNav = getTranslations("nav");

@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { sendPasswordVerificationEmail } from "../../actions/actions"
 import { useTranslations } from "next-intl"
-import Link from "next/link"
 import { toast } from "sonner"
+import { Link } from "@/i18n/routing"
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("forgotPassword")

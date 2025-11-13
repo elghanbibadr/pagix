@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import Link from "next/link"
 import { useState } from "react"
 import { ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
@@ -13,11 +12,12 @@ import logo from "@/public/icons/logo.png"
 
 import { login, loginWithGoogle } from "@/app/actions/actions"
 import Image from "next/image"
+import { Link } from "@/i18n/routing"
 
 export default function LoginPage() {
   const t = useTranslations("login")
   const locale = useLocale()
-  const isRTL = locale === "ar" || locale === "he"
+  const isRTL =  locale === "he"
 
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)

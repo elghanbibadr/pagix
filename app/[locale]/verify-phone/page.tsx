@@ -9,9 +9,9 @@ import { toast } from "sonner"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { useTranslations } from "next-intl"
-import Link from "next/link"
 import Image from "next/image"
 import logo from "@/public/icons/logo.png"
+import { Link } from "@/i18n/routing"
 
 function VerifyPhoneContent() {
   const t = useTranslations("verifyPhone")

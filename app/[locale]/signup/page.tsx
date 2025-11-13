@@ -1,6 +1,5 @@
 'use client'
 
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
@@ -11,6 +10,7 @@ import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import logo from "@/public/icons/logo.png"
+import { Link } from "@/i18n/routing"
 
 export default function SignupPage() {
   const t = useTranslations("signup")
