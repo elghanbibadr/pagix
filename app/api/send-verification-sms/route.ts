@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         user: { 
           username: SMS_USERNAME 
         },
-        phone: phone, // expects value like '05xxxxxxx' or '5xxxxxxx'
+        phone: phone, 
         source: SMS_FROM_NAME,
         valid_time: valid_time,
         max_tries: max_tries,
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(smsData)
     })
-
+const res=await response.json()
     const responseText = await response.text()
     console.log('  Response:', responseText)
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       message: 'SMS sent successfully',
-      response: responseText 
+      response:  res
     })
 
   } catch (error: any) {
