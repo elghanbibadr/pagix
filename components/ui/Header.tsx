@@ -9,13 +9,11 @@ import logo from "@/public/icons/logo.png"
 
 import Image from "next/image"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default  function Header({user}:{user:any}) {
   const tNav = useTranslations("nav");
 
 
-//   console.log("user on header", user)
-
-  console.log("user",user)
 
   return (
     <header className="border-b border-border">

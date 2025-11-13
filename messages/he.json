@@ -176,5 +176,23 @@
     "successTitle": "איפוס הסיסמה הצליח",
     "successDescription": "הסיסמה שלך אופסה בהצלחה. כעת תוכל להתחבר עם הסיסמה החדשה שלך.",
     "goToDashboard": "עבור לדשבורד"
+  },
+   "verifyPhone": {
+    "backToSignup": "חזרה להרשמה",
+    "title": "אמת את מספר הטלפון שלך",
+    "description": "הזן את הקוד בן 6 הספרות שנשלח אל",
+    "codeLabel": "קוד אימות",
+    "codePlaceholder": "123456",
+    "verifyButton": "אמת טלפון",
+    "verifying": "מאמת...",
+    "resendButton": "שלח קוד מחדש",
+    "resending": "שולח...",
+    "resendIn": "שלח מחדש בעוד {seconds} שניות",
+    "successTitle": "הטלפון אומת בהצלחה!",
+    "successMessage": "ברוך הבא ל-Pagix!",
+    "errorVerification": "האימות נכשל",
+    "errorResend": "שליחת הקוד מחדש נכשלה",
+    "errorGeneric": "משהו השתבש!",
+    "smsError": "שליחת SMS נכשלה. אנא נסה לשלוח שוב."
   }
 }

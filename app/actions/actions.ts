@@ -112,10 +112,9 @@ export async function signup(formData: FormData) {
       data: {
         full_name: fullName,
         phone: phone,
-        verification_code: verificationCode,
-        is_phone_verified: false,
+        verification_code: "123456",
+        phone_verified: false,
       },
-      // Remove email confirmation
       emailRedirectTo: undefined,
     }
   })
@@ -156,7 +155,7 @@ export async function signup(formData: FormData) {
 
   return {
     success: true,
-    redirectTo: `/dashboard`
+    redirectTo: `/verify-phone`
   }
 }
 
@@ -185,8 +184,8 @@ export async function verifyPhoneCode(code: string) {
     // Update user metadata to mark phone as verified
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
-        is_phone_verified: true,
-        verification_code: null // Clear the code after verification
+        phone_verified: true,
+        verification_code: null 
       }
     })
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { useState, useEffect, Suspense } from "react"
@@ -6,10 +7,14 @@ import { Input } from "@/components/ui/input"
 import { verifyPhoneCode, resendVerificationCode } from "../../actions/actions"
 import { toast } from "sonner"
 import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { useTranslations } from "next-intl"
+import Link from "next/link"
+import Image from "next/image"
+import logo from "@/public/icons/logo.png"
 
 function VerifyPhoneContent() {
+  const t = useTranslations("verifyPhone")
   const router = useRouter()
   const searchParams = useSearchParams()
   const phone = searchParams.get('phone') || ''
@@ -21,9 +26,9 @@ function VerifyPhoneContent() {
 
   useEffect(() => {
     if (smsError) {
-      toast.error("Failed to send SMS. Please try resending.")
+      toast.error(t("smsError"))
     }
-  }, [smsError])
+  }, [smsError, t])
 
   useEffect(() => {
     if (countdown > 0) {
@@ -43,16 +48,16 @@ function VerifyPhoneContent() {
       const result = await verifyPhoneCode(code)
 
       if (!result.success) {
-        toast.error(result.error || "Verification failed")
+        toast.error(result.error || t("errorVerification"))
       } else {
-        toast.success("Phone verified successfully! Welcome to Pagix!")
-        // Redirect to dashboard instead of email confirmation
+        toast.success(t("successTitle"))
+        // Redirect to dashboard
         setTimeout(() => {
           router.push('/dashboard')
         }, 1000)
       }
     } catch (err: any) {
-      toast.error("Something went wrong!")
+      toast.error(t("errorGeneric"))
     } finally {
       setLoading(false)
     }
@@ -67,13 +72,13 @@ function VerifyPhoneContent() {
       const result = await resendVerificationCode(phone)
 
       if (!result.success) {
-        toast.error(result.error || "Failed to resend code")
+        toast.error(result.error || t("errorResend"))
       } else {
-        toast.success("Verification code resent!")
+        toast.success(t("resendButton") + "!")
         setCountdown(60) // 60 second cooldown
       }
     } catch (err: any) {
-      toast.error("Something went wrong!")
+      toast.error(t("errorGeneric"))
     } finally {
       setResending(false)
     }
@@ -83,32 +88,34 @@ function VerifyPhoneContent() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8">
-          <Link href="/signup" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8">
+          <Link 
+            href="/signup" 
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8"
+          >
             <ArrowLeft className="w-4 h-4" />
-            Back to signup
+
+            {t("backToSignup")}
           </Link>
 
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">P</span>
-            </div>
-            <span className="text-xl font-bold">Pagix</span>
-          </div>
+                    <Image src={logo} alt="pagix logo" height={100} width={100} />
 
-          <h1 className="text-3xl font-bold mb-2">Verify Your Phone</h1>
+
+          <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
           <p className="text-muted-foreground">
-            Enter the 6-digit code sent to <span className="font-medium text-foreground">{phone}</span>
+            {t("description")} <span className="font-medium text-foreground">{phone}</span>
           </p>
         </div>
 
         <form onSubmit={handleVerify} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Verification Code</label>
+            <label className="block text-sm font-medium mb-2">
+              {t("codeLabel")}
+            </label>
             <Input
               required
               name="code"
               type="text"
-              placeholder="123456"
+              placeholder={t("codePlaceholder")}
               maxLength={6}
               pattern="[0-9]{6}"
               className="w-full text-center text-2xl tracking-widest font-mono"
@@ -118,23 +125,26 @@ function VerifyPhoneContent() {
           </div>
 
           <Button disabled={loading} className="w-full" size="lg" type="submit">
-            {loading ? "Verifying..." : "Verify Phone"}
+            {loading ? t("verifying") : t("verifyButton")}
           </Button>
-        </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground mb-2">
-            Didn't receive the code?
-          </p>
-          <Button
-            variant="ghost"
-            onClick={handleResend}
-            disabled={resending || countdown > 0}
-            className="text-primary hover:text-primary/80"
-          >
-            {resending ? "Resending..." : countdown > 0 ? `Resend in ${countdown}s` : "Resend Code"}
-          </Button>
-        </div>
+          <div className="text-center mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleResend}
+              disabled={resending || countdown > 0}
+              className="text-sm"
+            >
+              {resending 
+                ? t("resending") 
+                : countdown > 0 
+                  ? t("resendIn").replace("{seconds}", countdown.toString())
+                  : t("resendButton")
+              }
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   )

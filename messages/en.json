@@ -179,5 +179,23 @@
     "successTitle": "Password reset successful",
     "successDescription": "Your password has been reset successfully. You can now sign in with your new password.",
     "goToDashboard": "Go to Dashboard"
+  },
+   "verifyPhone": {
+    "backToSignup": "Back to signup",
+    "title": "Verify Your Phone",
+    "description": "Enter the 6-digit code sent to",
+    "codeLabel": "Verification Code",
+    "codePlaceholder": "123456",
+    "verifyButton": "Verify Phone",
+    "verifying": "Verifying...",
+    "resendButton": "Resend Code",
+    "resending": "Resending...",
+    "resendIn": "Resend in {seconds}s",
+    "successTitle": "Phone verified successfully!",
+    "successMessage": "Welcome to Pagix!",
+    "errorVerification": "Verification failed",
+    "errorResend": "Failed to resend code",
+    "errorGeneric": "Something went wrong!",
+    "smsError": "Failed to send SMS. Please try resending."
   }
 }

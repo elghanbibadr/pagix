@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { routing } from '@/i18n/routing'
@@ -65,8 +66,8 @@ export async function updateSession(request: NextRequest) {
     '/update-password',
     '/error',
     '/reset-password',
-    '/auth/callback',  // Add this
-    '/auth/auth-code-error',  // Add this
+    '/auth/callback',  
+    '/auth/auth-code-error',  
     ...authRoutes
   ]
 
@@ -78,16 +79,44 @@ export async function updateSession(request: NextRequest) {
     pathWithoutLocale === route || pathWithoutLocale.startsWith(route + '/')
   )
 
-  // If user is logged in and tries to access auth pages, redirect to dashboard
+  // Check if user signed up with OAuth (Google, etc.)
+  const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== 'email'
+
+  console.log('Middleware Check:', {
+    path: pathWithoutLocale,
+    hasUser: !!user,
+    provider: user?.app_metadata?.provider,
+    isOAuthUser,
+    isPhoneVerified: user?.user_metadata?.phone_verified,
+    isAuthRoute,
+    isPublicRoute
+  })
+
+  // 1. If user is logged in and tries to access auth pages, redirect to dashboard
   if (user && isAuthRoute) {
-    console.log("if is users", user)
+    console.log("Redirecting logged-in user from auth page to dashboard")
     const url = request.nextUrl.clone()
     url.pathname = `/${locale}/dashboard`
     return NextResponse.redirect(url)
   }
 
-  // If no user and trying to access protected routes, redirect to login
+  // 2. If user is email/password user (not OAuth) and phone not verified, redirect to verify-phone
+  if (
+    user && 
+    !isOAuthUser && 
+    !user.user_metadata?.phone_verified && 
+    !isPublicRoute && 
+    pathWithoutLocale !== '/verify-phone'
+  ) {
+    console.log("Redirecting unverified email user to verify-phone")
+    const url = request.nextUrl.clone()
+    url.pathname = `/${locale}/verify-phone`
+    return NextResponse.redirect(url)
+  }
+
+  // 3. If no user and trying to access protected routes, redirect to login
   if (!user && !isPublicRoute) {
+    console.log("Redirecting guest user to login")
     const url = request.nextUrl.clone()
     url.pathname = `/${locale}/login`
     return NextResponse.redirect(url)
