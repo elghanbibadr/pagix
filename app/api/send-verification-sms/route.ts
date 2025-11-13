@@ -35,8 +35,7 @@ export async function POST(request: NextRequest) {
     const formattedPhone = phone.replace(/\D/g, '')
     console.log('📞 Formatted phone:', formattedPhone)
 
-    const valid_time = 10 // minutes the code will be valid
-    const max_tries = 10
+    // const max_tries = 10
     const text = `Your Pagix verification code is: [code]`
 
     const smsData = {
@@ -46,8 +45,6 @@ export async function POST(request: NextRequest) {
         },
         phone: phone, // expects value like '05xxxxxxx' or '5xxxxxxx'
         source: SMS_FROM_NAME,
-        valid_time: valid_time,
-        max_tries: max_tries,
         text: text
       }
     }
