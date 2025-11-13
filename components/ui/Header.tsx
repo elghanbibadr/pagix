@@ -19,7 +19,10 @@ export default  function Header({user}:{user:any}) {
     <header className="border-b border-border">
       <nav className="border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-            <Image src={logo} alt="pagix logo" height={100} width={100} />
+          <Link href="/">
+                   <Image src={logo} alt="pagix logo" height={100} width={100} />
+                 </Link>
+       
          
           
           <div className="flex items-center gap-4">

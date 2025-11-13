@@ -66,7 +66,10 @@ const router=useRouter()
           </Link>
 
          <span className="text-xl font-bold">
-                     <Image className="mb-4" src={logo} alt="pagix logo" height={100} width={100} />
+                    <Link href="/">
+                             <Image src={logo} alt="pagix logo" height={100} width={100} />
+                           </Link>
+                 
                    </span>
 
           <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>

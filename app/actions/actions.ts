@@ -297,6 +297,8 @@ export async function sendPasswordVerificationEmail(email: string) {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=/reset-password`,
   })
 
+
+  console.log("send email data",data)
   if (error) {
     console.error('Password reset error:', error)
     return { success: false, error: "There was an error sending email try later !" }
