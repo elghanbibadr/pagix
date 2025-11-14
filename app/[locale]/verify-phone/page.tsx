@@ -68,11 +68,15 @@ function VerifyPhoneContent() {
 
     setResending(true);
 
+    console.log('phone',phone)
+
     try {
       const result = await resendVerificationCode(phone);
 
+
+      console.log("resylt resend",result)
       if (!result.success) {
-        toast.error(result.error || t("errorResend"));
+        toast.error(result.message || t("errorResend"));
       } else {
         toast.success(t("resendButton") + "!");
         setCountdown(60); // 60 second cooldown
@@ -141,8 +145,7 @@ function VerifyPhoneContent() {
               {resending
                 ? t("resending")
                 : countdown > 0
-                ? t("resendIn").replace("{seconds}", countdown.toString())
-                : t("resendButton")}
+? t("resendIn", { seconds: countdown })                : t("resendButton")}
             </Button>
           </div>
         </form>
