@@ -4,6 +4,7 @@
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
+import { success } from 'zod'
 
 
 export async function login(formData: FormData) {
@@ -312,8 +313,19 @@ const { data, error } = await supabase.auth.updateUser({
   password: newPassword
 })
 
-console.log('update pass data',data)
-console.log('update pass errr',error)
+
+if(error){
+  return {
+    success:false,
+    error:error.message
+  }
+}
+
+return {
+    success:true,
+
+}
+
 
 
 }

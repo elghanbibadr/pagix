@@ -124,6 +124,8 @@ export default function ResetPasswordPage() {
         result = await updateUserPassword(password)
       }
 
+
+      console.log("result",result)
       if (!result.success) {
         setError(result.error || "Failed to reset password")
         setIsLoading(false)
