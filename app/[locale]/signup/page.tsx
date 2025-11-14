@@ -135,17 +135,7 @@ export default function SignupPage() {
           </Button>
         </form>
 
-        {/* Benefits */}
-        <div className="mt-8 space-y-3 p-4 bg-secondary rounded-lg">
-          <p className="text-sm font-medium">{t("benefitsTitle")}</p>
-          {[t("benefit1"), t("benefit2"), t("benefit3")].map((benefit, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-              <span>{benefit}</span>
-            </div>
-          ))}
-        </div>
-
+     
         {/* Sign In */}
         <p className="text-center text-muted-foreground mt-6">
           {t("alreadyHaveAccount")}{" "}

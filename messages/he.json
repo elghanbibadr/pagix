@@ -148,7 +148,20 @@
     "successDescription": "שלחנו קישור לאיפוס סיסמה אל",
     "successInstructions": "לחץ על הקישור באימייל כדי לאפס את הסיסמה שלך.",
     "noEmail": "לא קיבלת אימייל? בדוק את תיקיית הספאם שלך או נסה שוב עם אימייל אחר.",
-    "tryAnother": "נסה אימייל אחר"
+    "tryAnother": "נסה אימייל אחר",
+     "back": "חזרה",
+     "phoneLabel": "מספר טלפון",
+    "phonePlaceholder": "הזן את מספר הטלפון שלך",
+    "sendSMSButton": "שלח SMS",
+         "phoneMethod": "איפוס דרך טלפון",
+             "emailMethod": "איפוס דרך אימייל",
+
+    "otpTitle": "הזן קוד אימות",
+    "otpDescription": "שלחנו קוד בן 6 ספרות אל",
+    "verifying": "מאמת...",
+    "verifyButton": "אמת קוד",
+    "didntReceiveCode": "לא קיבלת את הקוד?",
+    "resendCode": "שלח קוד מחדש"
   },
    "resetPassword": {
     "backToLogin": "חזרה להתחברות",

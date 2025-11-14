@@ -82,16 +82,7 @@ export async function updateSession(request: NextRequest) {
   // Check if user signed up with OAuth (Google, etc.)
   const isOAuthUser = user?.app_metadata?.provider && user.app_metadata.provider !== 'email'
 
-  console.log('Middleware Check:', {
-    path: pathWithoutLocale,
-    hasUser: !!user,
-    provider: user?.app_metadata?.provider,
-    isOAuthUser,
-    isPhoneVerified: user?.user_metadata?.phone_verified,
-    isAuthRoute,
-    isPublicRoute
-  })
-
+  
   // 1. If user is logged in and tries to access auth pages, redirect to dashboard
   if (user && isAuthRoute) {
     console.log("Redirecting logged-in user from auth page to dashboard")

@@ -135,7 +135,7 @@ export default function ForgotPasswordPage() {
 
     setIsLoading(false)
     
-    // Redirect to YOUR existing reset password page
+    // Redirect to  reset password page
     router.push(`/reset-password?token=${result.token}&phone=${encodeURIComponent(phone)}`)
   }
 

@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
-import { error } from 'console'
-import { success } from 'zod'
 
 
 export async function login(formData: FormData) {
@@ -325,60 +322,89 @@ console.log('update pass errr',error)
 
 
 // SEND SMS FOR PASSWORD RECOVERY
-
 export async function sendPasswordVerificationSMS(phone: string) {
   try {
     const supabase = await createClient()
     
-    // Generate 6-digit OTP
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString()
-    
-    // Check if user exists with this phone
-    const { data: profile, error: fetchError } = await supabase
+    // Check if user exists with this phone (handles multiple profiles)
+    const { data: profiles, error: fetchError } = await supabase
       .from('profiles')
       .select('*')
       .eq('phone', phone)
-      .single()
-  
-console.log("fecth error",fetchError)
 
-    if (fetchError || !profile) {
+    if (fetchError) {
+      console.error('[Fetch Error]:', fetchError)
+      return {
+        success: false,
+        error: "Database error occurred"
+      }
+    }
+
+    if (!profiles || profiles.length === 0) {
       return {
         success: false,
         error: "No account found with this phone number"
       }
     }
 
-    // Store verification code and expiry in profiles table
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        reset_code: verificationCode,
-        reset_code_expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
-        reset_code_used: false
-      })
-      .eq('phone', phone)
-
-    if (updateError) {
-      console.error('[DB Error]:', updateError)
-      throw new Error('Failed to store verification code')
+    if (profiles.length > 1) {
+      console.warn(`[Warning] Multiple profiles found for phone: ${phone}`)
     }
 
-    // Send SMS via your API
+    const profile = profiles[0]
+
+    //  Rate limiting check
+    if (profile.reset_code_expires_at) {
+      const lastCodeTime = new Date(profile.reset_code_expires_at).getTime() - (10 * 60 * 1000)
+      const timeSinceLastCode = Date.now() - lastCodeTime
+      
+      // If less than 1 minute since last code, reject
+      if (timeSinceLastCode < 60 * 1000 && !profile.reset_code_used) {
+        return {
+          success: false,
+          error: "Please wait before requesting another code"
+        }
+      }
+    }
+
+    // Send SMS via your API (service generates code automatically)
     const smsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/send-verification-sms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        phone,
-        code: verificationCode
-      })
+      body: JSON.stringify({ phone })
     })
 
     if (!smsResponse.ok) {
       const error = await smsResponse.json()
       throw new Error(error.message || 'Failed to send SMS')
+    }
+
+    // Get the generated code from the service response
+    const { code: verificationCode } = await smsResponse.json()
+
+    if (!verificationCode) {
+      throw new Error('Verification code not received from SMS service')
+    }
+
+    // Store code in profile (overwrites any previous reset data)
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        reset_code: verificationCode,
+        reset_code_expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        reset_code_used: false,
+        // Clear old token if exists
+        reset_token: null,
+        reset_token_expires_at: null,
+        reset_token_used: false
+      })
+      .eq('id', profile.id)
+
+    if (updateError) {
+      console.error('[DB Error]:', updateError)
+      throw new Error('Failed to store verification code')
     }
 
     console.log(`[SMS] Verification code sent to ${phone}`)
@@ -396,40 +422,52 @@ console.log("fecth error",fetchError)
   }
 }
 
+/**
+ * Verify OTP code and generate reset token
+ */
 export async function verifyPasswordResetCode(phone: string, code: string) {
   try {
     const supabase = await createClient()
     
     // Verify the code from profiles table
-    const { data: profile, error: fetchError } = await supabase
+    const { data: profiles, error: fetchError } = await supabase
       .from('profiles')
       .select('*')
       .eq('phone', phone)
       .eq('reset_code', code)
       .eq('reset_code_used', false)
       .gt('reset_code_expires_at', new Date().toISOString())
-      .single()
 
-    if (fetchError || !profile) {
+    if (fetchError) {
+      console.error('[Fetch Error]:', fetchError)
+      return {
+        success: false,
+        error: "Database error occurred"
+      }
+    }
+
+    if (!profiles || profiles.length === 0) {
       return {
         success: false,
         error: "Invalid or expired verification code"
       }
     }
+
+    const profile = profiles[0]
     
     // Generate reset token
     const resetToken = generateResetToken()
     
-    // Update profile with reset token and mark code as used
+    // Mark code as used and store reset token
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ 
         reset_code_used: true,
         reset_token: resetToken,
-        reset_token_expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes
+        reset_token_expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
         reset_token_used: false
       })
-      .eq('phone', phone)
+      .eq('id', profile.id)
 
     if (updateError) {
       console.error('[DB Error]:', updateError)
@@ -452,32 +490,37 @@ export async function verifyPasswordResetCode(phone: string, code: string) {
   }
 }
 
-function generateResetToken(): string {
-  const timestamp = Date.now()
-  const randomStr = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-  return `reset_${timestamp}_${randomStr}`
-}
-
-// Function to verify reset token on your reset password page
+/**
+ * Verify reset token on reset password page
+ */
 export async function verifyResetToken(token: string, phone: string) {
   try {
     const supabase = await createClient()
     
-    const { data: profile, error } = await supabase
+    const { data: profiles, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('phone', phone)
       .eq('reset_token', token)
       .eq('reset_token_used', false)
       .gt('reset_token_expires_at', new Date().toISOString())
-      .single()
 
-    if (error || !profile) {
+    if (error) {
+      console.error('[Fetch Error]:', error)
+      return {
+        success: false,
+        error: "Database error occurred"
+      }
+    }
+
+    if (!profiles || profiles.length === 0) {
       return {
         success: false,
         error: "Invalid or expired reset token"
       }
     }
+
+    const profile = profiles[0]
     
     return {
       success: true,
@@ -493,7 +536,9 @@ export async function verifyResetToken(token: string, phone: string) {
   }
 }
 
-// Function to update password and mark token as used
+/**
+ * Reset password using verified token
+ */
 export async function resetPasswordWithToken(token: string, phone: string, newPassword: string) {
   try {
     const supabase = await createClient()
@@ -504,21 +549,27 @@ export async function resetPasswordWithToken(token: string, phone: string, newPa
       return verification
     }
 
-    // Update password in auth.users
-    const { data: profile } = await supabase
+    // Get the specific profile
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('id')
       .eq('phone', phone)
-      .single()
+      .eq('reset_token', token)
 
-    if (!profile) {
+
+      console.log("reset token",token)
+
+      console.log("profiles",profiles)
+    if (!profiles || profiles.length === 0) {
       return {
         success: false,
         error: "User not found"
       }
     }
 
-    
+    const profile = profiles[0]
+
+    // Update password using Supabase Admin API
     const { error: passwordError } = await supabase.auth.admin.updateUserById(
       profile.id,
       { password: newPassword }
@@ -532,16 +583,18 @@ export async function resetPasswordWithToken(token: string, phone: string, newPa
       }
     }
 
-    // Mark token as used
+    // Clear all reset fields (ready for next reset)
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ 
-        reset_token_used: true,
-        // Clear reset fields for security
         reset_code: null,
-        reset_token: null
+        reset_code_expires_at: null,
+        reset_code_used: false,
+        reset_token: null,
+        reset_token_expires_at: null,
+        reset_token_used: false
       })
-      .eq('phone', phone)
+      .eq('id', profile.id)
 
     if (updateError) {
       console.error('[DB Error]:', updateError)
@@ -558,4 +611,13 @@ export async function resetPasswordWithToken(token: string, phone: string, newPa
       error: "Failed to reset password. Please try again."
     }
   }
+}
+
+/**
+ * Helper: Generate secure reset token
+ */
+function generateResetToken(): string {
+  const timestamp = Date.now()
+  const randomStr = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+  return `reset_${timestamp}_${randomStr}`
 }

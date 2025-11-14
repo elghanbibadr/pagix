@@ -2,17 +2,28 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Lock, ArrowLeft, CheckCircle, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { updateUserPassword } from "../../actions/actions"
+import { updateUserPassword, verifyResetToken, resetPasswordWithToken } from "../../actions/actions"
 import { useTranslations } from "next-intl"
-import { Link } from "@/i18n/routing"
+import { Link, useRouter } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
 export default function ResetPasswordPage() {
   const t = useTranslations("resetPassword")
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Detect which flow: email or phone
+  const token = searchParams.get("token")
+  const phone = searchParams.get("phone")
+  const isPhoneFlow = !!(token && phone) // Phone OTP flow
+  const isEmailFlow = !token && !phone // Email link flow (logged in user)
+  
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -20,6 +31,45 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState("")
+  const [isVerifying, setIsVerifying] = useState(true)
+
+  // Verify token on mount (for phone flow)
+  useEffect(() => {
+    if (isPhoneFlow) {
+      verifyToken()
+    } else if (isEmailFlow) {
+      // Email flow - user is already logged in
+      setIsVerifying(false)
+    } else {
+      // Invalid access
+      toast.error("Invalid reset link")
+      router.push("/forgot-password")
+    }
+  }, [])
+
+  const verifyToken = async () => {
+    if (!token || !phone) {
+      toast.error("Invalid reset link")
+      router.push("/forgot-password")
+      return
+    }
+
+    try {
+      const result = await verifyResetToken(token, decodeURIComponent(phone))
+      
+      if (!result.success) {
+        toast.error(result.error || "Invalid or expired reset link")
+        router.push("/forgot-password")
+        return
+      }
+      
+      setIsVerifying(false)
+    } catch (error) {
+      console.error("Token verification error:", error)
+      toast.error("Failed to verify reset link")
+      router.push("/forgot-password")
+    }
+  }
 
   const validatePassword = (pwd: string) => {
     if (pwd.length < 8) {
@@ -59,11 +109,48 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true)
 
-    await updateUserPassword(password)
-    setTimeout(() => {
+    try {
+      let result
+
+      if (isPhoneFlow) {
+        // Phone OTP flow - use token
+        result = await resetPasswordWithToken(
+          token!,
+          decodeURIComponent(phone!),
+          password
+        )
+      } else {
+        // Email flow - update logged in user's password
+        result = await updateUserPassword(password)
+      }
+
+      if (!result.success) {
+        setError(result.error || "Failed to reset password")
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(false)
       setIsSubmitted(true)
-    }, 1500)
+    } catch (error) {
+      console.error("Password reset error:", error)
+      setError("An error occurred. Please try again.")
+      setIsLoading(false)
+    }
+  }
+
+  // Show loading while verifying token
+  if (isVerifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md p-8">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-muted-foreground">Verifying reset link...</p>
+          </div>
+        </Card>
+      </div>
+    )
   }
 
   if (isSubmitted) {
@@ -84,9 +171,9 @@ export default function ResetPasswordPage() {
             {t("successDescription")}
           </p>
 
-          <Link href="/dashboard">
+          <Link href={isPhoneFlow ? "/login" : "/dashboard"}>
             <Button className="w-full h-11 font-semibold">
-              {t("goToDashboard")}
+              {isPhoneFlow ? t("goToLogin") : t("goToDashboard")}
             </Button>
           </Link>
         </Card>
@@ -100,11 +187,11 @@ export default function ResetPasswordPage() {
         {/* Header */}
         <div className="mb-8">
           <Link
-            href="/login"
+            href={isPhoneFlow ? "/login" : "/dashboard"}
             className="inline-flex items-center text-primary hover:text-primary/80 transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t("backToLogin")}
+            {isPhoneFlow ? t("backToLogin") : t("backToDashboard")}
           </Link>
 
           <div className="flex justify-center mb-6">
@@ -118,7 +205,7 @@ export default function ResetPasswordPage() {
           </h1>
 
           <p className="text-center text-muted-foreground">
-            {t("description")}
+            {isPhoneFlow ? t("descriptionPhone") : t("description")}
           </p>
         </div>
 

@@ -161,7 +161,18 @@
     "rememberPassword": "Remember your password?",
     "signIn": "Sign in",
     "emailMethod": "Email",
-    "phoneMethod": "Phone"
+    "phoneMethod": "Phone",
+      "back": "Back",
+    "otpTitle": "Enter Verification Code",
+    "otpDescription": "We sent a 6-digit code to",
+    "verifying": "Verifying...",
+    "verifyButton": "Verify Code",
+    "didntReceiveCode": "Didn't receive the code?",
+    "resendCode": "Resend Code",
+        "sendSmsButton": "Send SMS"
+     
+
+   
   },
    "resetPassword": {
     "backToLogin": "Back to login",
