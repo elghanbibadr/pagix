@@ -24,6 +24,7 @@ export default function SignupPage() {
 
     try {
       const result = await signup(formData)
+      console.log('sign up result',result)
       if (!result.success) {
         toast(result.error)
       } else {

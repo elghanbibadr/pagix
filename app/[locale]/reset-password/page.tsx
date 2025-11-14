@@ -36,6 +36,7 @@ export default function ResetPasswordPage() {
   // Verify token on mount (for phone flow)
   useEffect(() => {
     if (isPhoneFlow) {
+      // eslint-disable-next-line react-hooks/immutability
       verifyToken()
     } else if (isEmailFlow) {
       // Email flow - user is already logged in

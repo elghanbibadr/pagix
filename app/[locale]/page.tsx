@@ -1,6 +1,8 @@
 // "use client";
 
 import { Button } from "@/components/ui/button";
+import logo from "@/public/icons/logo.png"
+
 import {
   ArrowRight,
   Zap,
@@ -14,6 +16,7 @@ import Header from "@/components/ui/Header";
 import { getTranslations } from "next-intl/server";
 import { getUser } from "../actions/actions";
 import { Link } from "@/i18n/routing";
+import Image from "next/image";
 
 export default async  function LandingPage() {
   const tNav = getTranslations("nav");
@@ -105,12 +108,8 @@ export default async  function LandingPage() {
       <footer className="border-t border-border mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">P</span>
-              </div>
-              <span className="font-semibold">{tFooter("brand")}</span>
-            </div>
+                               <Image src={logo} alt="pagix logo" height={100} width={100} />
+            
             <p className="text-muted-foreground text-sm">
               {tFooter("copyright")}
             </p>

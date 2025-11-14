@@ -94,6 +94,15 @@ export async function signup(formData: FormData) {
     };
   }
 
+  const { data: existingProfile, error: checkError } = await supabase
+  .from('profiles')
+  .select('phone')
+  .eq('phone', phone)
+  .maybeSingle();
+
+if (existingProfile) {
+  return { success: false,error: 'Phone number already exists' };
+}
   // Generate verification code
 
   const { data: authData, error } = await supabase.auth.signUp({
@@ -110,6 +119,7 @@ export async function signup(formData: FormData) {
     },
   });
 
+  console.log('error',error)
   if (error) {
     return {
       success: false,
@@ -155,7 +165,6 @@ export async function signup(formData: FormData) {
     await supabase.auth.updateUser({
       data: {
         verification_code: verificationCode,
-        phone_verified: true,
       },
     });
   } catch (smsError) {
