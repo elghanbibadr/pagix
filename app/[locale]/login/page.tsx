@@ -92,7 +92,7 @@ export default function LoginPage() {
                 required 
                 name="password" 
                 type={showPassword ? "text" : "password"} 
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 className="pr-10"
               />
               <button
