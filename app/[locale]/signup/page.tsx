@@ -124,19 +124,27 @@ export default function SignupPage() {
             />
           </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium mb-2">
-              {t("phone")}
-            </label>
-            <Input
-              id="phone"
-              name="phone"
-              type="number"
-              placeholder={t("phonePlaceholder")}
-              required
-              disabled={loading}
-            />
-          </div>
+     <div>
+<div>
+  <label htmlFor="phone" className="block text-sm font-medium mb-2">
+    {t("phone")}
+  </label>
+  <Input
+    id="phone"
+    name="phone"
+    type="tel"
+    placeholder={t("phonePlaceholder")}
+    required
+    disabled={loading}
+    pattern="[0-9]*"
+    inputMode="numeric"
+    onInput={(e) => {
+      // Remove any non-digit characters
+      e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '')
+    }}
+  />
+</div>
+</div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-2">
