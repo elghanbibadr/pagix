@@ -131,7 +131,7 @@ export default function SignupPage() {
             <Input
               id="phone"
               name="phone"
-              type="tel"
+              type="number"
               placeholder={t("phonePlaceholder")}
               required
               disabled={loading}

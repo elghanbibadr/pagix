@@ -2,7 +2,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import { useTranslations, useLocale } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,9 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
-const router=useRouter()
+  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -30,7 +32,6 @@ const router=useRouter()
 
     try {
       const result = await login(formData)
-
 
       if (!result.success) {
         toast.error(result.error)
@@ -85,7 +86,24 @@ const router=useRouter()
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-2">{t("password")}</label>
-            <Input id="password" required name="password" type="password" placeholder="••••••••" />
+            <div className="relative">
+              <Input 
+                id="password" 
+                required 
+                name="password" 
+                type={showPassword ? "text" : "password"} 
+                placeholder="••••••••"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-sm">
