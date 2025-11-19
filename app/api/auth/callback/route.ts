@@ -5,8 +5,10 @@ import { routing } from '@/i18n/routing'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const locale = searchParams.get('locale') ?? routing.defaultLocale
+  const locale = searchParams.get('locale') ?? routing.defaultLocale 
 
+
+  console.log("my lcoale",locale)
 
 
   // Check if "next" is in param, use it as the redirect URL

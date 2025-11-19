@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
 import { success } from "zod";
+import { cookies } from "next/headers";
+import { getLocale } from "next-intl/server";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -299,11 +301,12 @@ export async function logout() {
 export async function loginWithGoogle() {
   const supabase = await createClient();
 
+  const locale = await getLocale(); // Await the promise returned by getLocale()
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-    },
+redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?locale=${locale}`,    },
   });
 
 
