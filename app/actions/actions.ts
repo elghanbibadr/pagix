@@ -306,10 +306,7 @@ export async function loginWithGoogle() {
     },
   });
 
-  console.log("error google", error);
-  console.log("data google", data);
 
-  console.log("url", process.env.NEXT_PUBLIC_APP_URL);
   if (error) {
     return { success: false, error: error.message };
   }
@@ -319,6 +316,28 @@ export async function loginWithGoogle() {
   }
 }
 
+// export async function loginWithGoogle(origin: string) {
+//   const supabase = await createClient();
+
+//   const { data, error } = await supabase.auth.signInWithOAuth({
+//     provider: "google",
+//     options: {
+//       redirectTo: `${origin}/api/auth/callback`,
+//     },
+//   });
+
+//   console.log("error google", error);
+//   console.log("data google", data);
+//   console.log("redirect URL", `${origin}/api/auth/callback`);
+
+//   if (error) {
+//     return { success: false, error: error.message };
+//   }
+
+//   if (data.url) {
+//     redirect(data.url);
+//   }
+// }
 export async function sendPasswordVerificationEmail(email: string) {
   const supabase = await createClient();
 

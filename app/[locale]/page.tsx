@@ -37,6 +37,9 @@ export default async  function LandingPage() {
     { icon: CheckCircle2, ...tFeatures.raw("items.5") }
   ];
 
+ 
+ 
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
