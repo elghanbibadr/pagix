@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Settings, LogOut, Plus } from "lucide-react"
+import { LayoutDashboard, Settings, LogOut, Plus, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getUser, logout } from "@/app/actions/actions"
 import { useTranslations, useLocale } from "next-intl"
@@ -25,7 +25,7 @@ export default function DashboardSidebar() {
   const pathnameWithoutLocale = pathname.replace(`/${locale}`, '') || '/'
 
   const navItems = [
-    { href: "/dashboard", label: t("dashboard"), icon: LayoutDashboard },
+    { href: "/dashboard", label: t("dashboard"), icon: Home },
     { href: "/builder", label: t("createPage"), icon: Plus },
     { href: "/settings", label: t("settings"), icon: Settings },
   ]
@@ -45,7 +45,7 @@ export default function DashboardSidebar() {
   return (
     <aside className="w-64 border-r border-border bg-background h-screen sticky top-0 flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-border">
+      <div className="p-6">
         <Link href={`/${locale}/dashboard`} className="flex items-center gap-2">
                     <Image src={logo} alt="pagix logo" height={120} width={120} />
 
@@ -53,24 +53,23 @@ export default function DashboardSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = 
-            pathnameWithoutLocale === item.href || 
-            pathnameWithoutLocale.startsWith(item.href + "/")
+     <nav className="flex-1 p-2 space-y-2">
+  {navItems.map((item) => {
+    const Icon = item.icon
+    const isActive = 
+      pathnameWithoutLocale === item.href || 
+      pathnameWithoutLocale.startsWith(item.href + "/")
 
-          return (
-            <Link key={item.href} href={`/${locale}${item.href}`}>
-              <span  className={`w-full  flex items-center text-sm font-medium  my-4 ${isActive ? "text-black bg-[#fbf9fa]" :"" } px-3 py-2 rounded-md  bg-none justify-start gap-3 hover:text-[#FFB600] hover:bg-[#fbf9fa]  duration-75 transition-all ease-in`}>
-                <Icon className="w-5 font-normal h-5" />
-                {item.label}
-              </span>
-            </Link>
-          )
-        })}
-      </nav>
-
+    return (
+      <Link key={item.href} href={`/${locale}${item.href}`}>
+        <span className={`w-full flex items-center text-sm font-medium py-3 ${isActive ? "text-[#FFB600] bg-[#fbf9fa]" : ""} hover:text-[#FFB600] hover:bg-[#fbf9fa] px-3 py-2 rounded-md bg-none justify-start gap-3 duration-75 transition-all ease-in group`}>
+          <Icon className={`w-5 font-normal h-5 ${isActive ? "text-[#FFB600]" : "text-[#99a1af] group-hover:text-[#FFB600]"}`} />
+          {item.label}
+        </span>
+      </Link>
+    )
+  })}
+</nav>
       {/* User Profile & Logout */}
       <div className="p-4 border-t border-border space-y-3">
         <div className="px-3 py-2">

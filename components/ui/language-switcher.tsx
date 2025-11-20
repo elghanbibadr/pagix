@@ -33,7 +33,7 @@ export function LanguageSwitcher() {
   const currentLanguage = languages.find((lang) => lang.code === locale);
 
   return (
-    <div className=''>
+    <div className='border-[1px] rounded-md focus:border-none'>
       <DropdownMenu >
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-2">
