@@ -1,14 +1,11 @@
 'use client';
-
-import { getUser, logout } from '@/app/actions/actions';
 import { Button } from '@/components/ui/button';
 import logo from '@/public/icons/logo.png';
-import { Home, LogOut, Plus, Settings, X } from 'lucide-react';
+import { Home, Plus, Settings, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 interface DashboardSidebarProps {
   isOpen?: boolean;
@@ -16,33 +13,19 @@ interface DashboardSidebarProps {
 }
 
 export default function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarProps) {
-  const [userEmail, setUserEmail] = useState('');
-  const [userName, setUserName] = useState('');
-
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('sidebar');
+  const isRTL = locale === 'he';
 
   // Remove locale from pathname for comparison
   const pathnameWithoutLocale = pathname.replace(`/${locale}`, '') || '/';
 
   const navItems = [
     { href: '/dashboard', label: t('dashboard'), icon: Home },
-    { href: '/builder', label: t('createPage'), icon: Plus },
+    { href: '/builder', label: t('createPage'), icon: Plus }
     // { href: '/settings', label: t('settings'), icon: Settings }
   ];
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getUser();
-      if (user) {
-        setUserEmail(user.user.email);
-        setUserName(user.user.user_metadata.name);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   // Close sidebar when navigating on mobile/tablet
   const handleLinkClick = () => {
@@ -64,11 +47,18 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
       {/* Sidebar */}
       <aside
         className={`
-          fixed lg:sticky top-0 left-0 z-50
-          w-72 border-r border-border bg-background h-screen
+          fixed lg:sticky top-0 z-50
+          ${isRTL ? 'right-0' : 'left-0'}
+          w-72 ${isRTL ? 'border-l' : 'border-r'} border-border bg-background h-screen
           flex flex-col
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${
+            isOpen
+              ? 'translate-x-0'
+              : isRTL
+              ? 'translate-x-full lg:translate-x-0'
+              : '-translate-x-full lg:translate-x-0'
+          }
         `}
       >
         {/* Close button for mobile/tablet */}
@@ -93,7 +83,7 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
         </div>
 
         {/* Navigation */}
-        <nav className='flex-1 p-4 pt-0 space-y-2'>
+        <nav className='flex-1 p-4 pt-2 space-y-2'>
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive =
@@ -120,16 +110,10 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
         </nav>
         {/* User Profile & Logout */}
         <div className='p-4 '>
-          <Link
-            key="/settings"
-            href={`/${locale}/settings`}
-            onClick={handleLinkClick}
-          >
+          <Link key='/settings' href={`/${locale}/settings`} onClick={handleLinkClick}>
             <span
               className={`w-full flex items-center text-sm font-medium mb-1 py-2 pointer ${
-                pathnameWithoutLocale === '/settings'
-                  ? 'text-[#f4b300] bg-[#fbf9fa]'
-                  : ''
+                pathnameWithoutLocale === '/settings' ? 'text-[#f4b300] bg-[#fbf9fa]' : ''
               } hover:text-[#f4b300] hover:bg-[#fbf9fa] px-2 py-2 rounded-md bg-none justify-start gap-3 duration-75 transition-all ease-in group`}
             >
               <Settings
