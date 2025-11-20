@@ -143,7 +143,7 @@ declare const messages: {
     "title": "Forgot Password?",
     "description": "No worries, we'll send you reset instructions.",
     "emailLabel": "Email address",
-    "emailPlaceholder": " email",
+    "emailPlaceholder": "Enter your email",
     "phoneLabel": "Phone number",
     "phonePlaceholder": "Enter your phone",
     "sendButton": "Send reset link",

@@ -1,19 +1,18 @@
-"use client";
+'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Languages } from 'lucide-react';
+import { useLocale } from 'next-intl';
+import { usePathname, useRouter } from 'next/navigation';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'he', name: 'עברית', flag: '🇮🇱' },
+  { code: 'he', name: 'עברית', flag: '🇮🇱' }
 ];
 
 export function LanguageSwitcher() {
@@ -25,30 +24,31 @@ export function LanguageSwitcher() {
     // Get the current path without the locale
     const segments = pathname.split('/').filter(Boolean);
     const pathWithoutLocale = segments.slice(1).join('/');
-    
+
     // Navigate to the new locales
     router.push(`/${newLocale}/${pathWithoutLocale}`);
   };
 
-  const currentLanguage = languages.find((lang) => lang.code === locale);
+  const currentLanguage = languages.find(lang => lang.code === locale);
 
   return (
     <div className='border-[1px] rounded-md focus:border-none'>
-      <DropdownMenu >
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <Languages className="h-4 w-4" />
-            <span className="hidden sm:inline">{currentLanguage?.flag}</span>
+          <Button variant='ghost' size='sm' className='gap-2'>
+            <span className='text-lg'>{currentLanguage?.flag}</span>
+            <span className='hidden sm:inline font-medium'>{currentLanguage?.name}</span>
+            {/* <Languages className='h-4 w-4 hidden sm:block' /> */}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {languages.map((language) => (
+        <DropdownMenuContent align='end'>
+          {languages.map(language => (
             <DropdownMenuItem
               key={language.code}
               onClick={() => switchLanguage(language.code)}
               className={locale === language.code ? 'bg-accent' : ''}
             >
-              <span className="mr-2">{language.flag}</span>
+              <span className='mr-2 text-lg'>{language.flag}</span>
               {language.name}
             </DropdownMenuItem>
           ))}
