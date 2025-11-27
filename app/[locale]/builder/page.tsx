@@ -1,16 +1,19 @@
+// app/page.tsx
 'use client';
 
 import { Editor, Frame, Element } from '@craftjs/core';
 import { createTheme, ThemeProvider } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Viewport, RenderNode } from '@/components/editor';
 import { Container, Text } from '@/components/selectors';
 import { Button } from '@/components/selectors/Button';
-import { Custom1, OnlyButtons } from '@/components/selectors/Custom1';
-import { Custom2, Custom2VideoDrop } from '@/components/selectors/Custom2';
-import { Custom3, Custom3BtnDrop } from '@/components/selectors/Custom3';
-import { Video } from '@/components/selectors/Video';
+import { Link } from '@/components/selectors/Link';
+import { ButtonLink } from '@/components/selectors/ButtonLink';
+import { PageProvider, usePages } from '@/contexts/PageContext';
+import { PageNavigation } from '@/components/PageNavigation';
+import { PageLoader } from '@/components/PageLoader';
+import { TestLinks } from '@/components/ui/TestLinks';
 
 const theme = createTheme({
   typography: {
@@ -24,360 +27,98 @@ const theme = createTheme({
   },
 });
 
-export default function Home() {
+const EditorContent= ({pageContent}:{pageContent:string}) => {
   return (
-    <ThemeProvider theme={theme}>
-      <div className="h-full h-screen">
+    <>
+      {/* <PageLoader /> */}
+      <Frame  data={pageContent}>
+        <Element
+          canvas
+          is={Container}
+          width="800px"
+          height="auto"
+          background={{ r: 255, g: 255, b: 255, a: 1 }}
+          padding={['40', '40', '40', '40']}
+          custom={{ displayName: 'App' }}
+        >
+          {/* <Text fontSize="23" fontWeight="400" text="Welcome to the page"></Text> */}
+        </Element>
+      </Frame>
+    </>
+  );
+};
+
+const EditorWrapper: React.FC = () => {
+  const { setPreviewMode,currentPage,currentPageId } = usePages();
+  const [isPreview, setIsPreview] = useState(false);
+
+  console.log('current page',currentPage)
+
+  const handlePreviewToggle = () => {
+    const newPreviewState = !isPreview;
+    setIsPreview(newPreviewState);
+    setPreviewMode(newPreviewState);
+  };
+
+  return (
+    <div className="h-full h-screen flex flex-col">
+      {/* Top Bar */}
+      <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Website Editor</h1>
+        <div className="flex gap-2">
+          <button
+            onClick={handlePreviewToggle}
+            className={`px-4 py-2 rounded transition-colors ${
+              isPreview
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {isPreview ? '✓ Preview Mode' : 'Preview'}
+          </button>
+          {isPreview && (
+            <button
+              onClick={handlePreviewToggle}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded"
+            >
+              Exit Preview
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Page Navigation */}
+  {/* <TestLinks/> */}
+      {/* Editor */}
+      <div className="flex-1 overflow-hidden">
         <Editor
           resolver={{
             Container,
             Text,
-            Custom1,
-            Custom2,
-            Custom2VideoDrop,
-            Custom3,
-            Custom3BtnDrop,
-            OnlyButtons,
             Button,
-            Video,
+            Link,
+            ButtonLink,
           }}
-          enabled={false}
+          enabled={!isPreview} // Disable editing in preview mode
           onRender={RenderNode}
         >
           <Viewport>
-            <Frame>
-              <Element
-                canvas
-                is={Container}
-                width="800px"
-                height="auto"
-                background={{ r: 255, g: 255, b: 255, a: 1 }}
-                padding={['40', '40', '40', '40']}
-                custom={{ displayName: 'App' }}
-              >
-                <Element
-                  canvas
-                  is={Container}
-                  flexDirection="row"
-                  width="100%"
-                  height="auto"
-                  padding={['40', '40', '40', '40']}
-                  margin={['0', '0', '40', '0']}
-                  custom={{ displayName: 'Introduction' }}
-                >
-                  <Element
-                    canvas
-                    is={Container}
-                    width="40%"
-                    height="100%"
-                    padding={['0', '20', '0', '20']}
-                    custom={{ displayName: 'Heading' }}
-                  >
-                    <Text
-                      fontSize="23"
-                      fontWeight="400"
-                      text="This is a title."
-                    ></Text>
-                  </Element>
-                  <Element
-                    canvas
-                    is={Container}
-                    width="60%"
-                    height="100%"
-                    padding={['0', '20', '0', '20']}
-                    custom={{ displayName: 'Description' }}
-                  >
-                    <Text
-                      fontSize="14"
-                      fontWeight="400"
-                      text="
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed suscipit, ipsum sed tincidunt faucibus, justo nunc congue libero, non lacinia felis ligula vel nulla. <br /> <br /> Aenean viverra, justo at ultricies porta, orci lectus blandit pu
-                      "
-                    ></Text>
-                  </Element>
-                </Element>
+      <PageNavigation />
 
-                <Element
-                  canvas
-                  is={Container}
-                  background={{ r: 39, g: 41, b: 41, a: 1 }}
-                  flexDirection="column"
-                  width="100%"
-                  height="auto"
-                  padding={['40', '40', '40', '40']}
-                  margin={['0', '0', '40', '0']}
-                  custom={{ displayName: 'ComplexSection' }}
-                >
-                  <Element
-                    canvas
-                    background={{
-                      r: 76,
-                      g: 78,
-                      b: 78,
-                      a: 0,
-                    }}
-                    is={Container}
-                    flexDirection="row"
-                    margin={['0', '0', '0', '0']}
-                    width="100%"
-                    height="auto"
-                    alignItems="center"
-                    custom={{ displayName: 'Wrapper' }}
-                  >
-                    <Element
-                      canvas
-                      background={{
-                        r: 0,
-                        g: 0,
-                        b: 0,
-                        a: 0,
-                      }}
-                      is={Container}
-                      alignItems="center"
-                      padding={['0', '0', '0', '0']}
-                      flexDirection="row"
-                      width="350px"
-                      height="250px"
-                      custom={{ displayName: 'Square' }}
-                    >
-                      <Element
-                        canvas
-                        is={Container}
-                        justifyContent="center"
-                        alignItems="center"
-                        background={{
-                          r: 76,
-                          g: 78,
-                          b: 78,
-                          a: 1,
-                        }}
-                        shadow={25}
-                        width="90%"
-                        height="90%"
-                        padding={['10', '20', '10', '20']}
-                        custom={{ displayName: 'Outer' }}
-                      >
-                        <Element
-                          canvas
-                          is={Container}
-                          justifyContent="center"
-                          alignItems="center"
-                          background={{
-                            r: 76,
-                            g: 78,
-                            b: 78,
-                            a: 1,
-                          }}
-                          shadow={50}
-                          width="80%"
-                          height="80%"
-                          padding={['10', '20', '10', '20']}
-                          custom={{ displayName: 'Middle' }}
-                        >
-                          <Element
-                            canvas
-                            is={Container}
-                            justifyContent="center"
-                            alignItems="center"
-                            background={{
-                              r: 76,
-                              g: 78,
-                              b: 78,
-                              a: 1,
-                            }}
-                            shadow={50}
-                            width="60%"
-                            height="60%"
-                            padding={['10', '20', '10', '20']}
-                            custom={{ displayName: 'Inner' }}
-                          />
-                        </Element>
-                      </Element>
-                    </Element>
-                    <Element
-                      canvas
-                      background={{
-                        r: 0,
-                        g: 0,
-                        b: 0,
-                        a: 0,
-                      }}
-                      is={Container}
-                      padding={['0', '0', '0', '20']}
-                      flexDirection="column"
-                      width="55%"
-                      height="100%"
-                      fillSpace="yes"
-                      custom={{ displayName: 'Content' }}
-                    >
-                      <Text
-                        color={{
-                          r: '255',
-                          g: '255',
-                          b: '255',
-                          a: '1',
-                        }}
-                        margin={['0', '0', '18', '0']}
-                        fontSize="20"
-                        text="Design complex components"
-                      ></Text>
-                      <Text
-                        color={{
-                          r: '255',
-                          g: '255',
-                          b: '255',
-                          a: '0.8',
-                        }}
-                        fontSize="14"
-                        fontWeight="400"
-                        text="
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed suscipit, ipsum sed tincidunt faucibus, justo nunc congue libero, non lacinia felis ligula vel nulla. <br /> <br /> Aenean viverra, justo at ultricies porta, orci lectus blandit pu
-                        "
-                      ></Text>
-                    </Element>
-                  </Element>
-                </Element>
-                <Element
-                  canvas
-                  is={Container}
-                  background={{
-                    r: 234,
-                    g: 245,
-                    b: 245,
-                    a: 1,
-                  }}
-                  flexDirection="column"
-                  width="100%"
-                  height="auto"
-                  padding={['40', '40', '40', '40']}
-                  margin={['0', '0', '40', '0']}
-                  custom={{ displayName: 'Programmatic' }}
-                >
-                  <Element
-                    canvas
-                    background={{
-                      r: 76,
-                      g: 78,
-                      b: 78,
-                      a: 0,
-                    }}
-                    is={Container}
-                    flexDirection="column"
-                    margin={['0,', '0', '20', '0']}
-                    width="100%"
-                    height="auto"
-                    custom={{ displayName: 'Heading' }}
-                  >
-                    <Text
-                      color={{
-                        r: '46',
-                        g: '47',
-                        b: '47',
-                        a: '1',
-                      }}
-                      fontSize="23"
-                      text="Programmatic drag &amp; drop"
-                    ></Text>
-                    <Text
-                      fontSize="14"
-                      fontWeight="400"
-                      text="Govern what goes in and out of your components"
-                    ></Text>
-                  </Element>
-                  <Element
-                    canvas
-                    background={{
-                      r: 76,
-                      g: 78,
-                      b: 78,
-                      a: 0,
-                    }}
-                    is={Container}
-                    flexDirection="row"
-                    margin={['30', '0', '0', '0']}
-                    width="100%"
-                    height="auto"
-                    custom={{ displayName: 'Content' }}
-                  >
-                    <Element
-                      canvas
-                      background={{
-                        r: 0,
-                        g: 0,
-                        b: 0,
-                        a: 0,
-                      }}
-                      is={Container}
-                      padding={['0', '20', '0', '0']}
-                      flexDirection="row"
-                      width="45%"
-                      custom={{ displayName: 'Left' }}
-                    >
-                      <Custom1
-                        background={{
-                          r: 119,
-                          g: 219,
-                          b: 165,
-                          a: 1,
-                        }}
-                        height="auto"
-                        width="100%"
-                        padding={['20', '20', '20', '20']}
-                        margin={['0', '0', '0', '0']}
-                        shadow={40}
-                      />
-                    </Element>
-                    <Element
-                      canvas
-                      background={{
-                        r: 0,
-                        g: 0,
-                        b: 0,
-                        a: 0,
-                      }}
-                      is={Container}
-                      padding={['0', '0', '0', '20']}
-                      flexDirection="column"
-                      width="55%"
-                      custom={{ displayName: 'Right' }}
-                    >
-                      <Custom2
-                        background={{
-                          r: 108,
-                          g: 126,
-                          b: 131,
-                          a: 1,
-                        }}
-                        height="125px"
-                        width="100%"
-                        padding={['0', '0', '0', '20']}
-                        margin={['0', '0', '0', '0']}
-                        shadow={40}
-                        flexDirection="row"
-                        alignItems="center"
-                      />
-                      <Custom3
-                        background={{
-                          r: 134,
-                          g: 187,
-                          b: 201,
-                          a: 1,
-                        }}
-                        height="auto"
-                        width="100%"
-                        padding={['20', '20', '20', '20']}
-                        margin={['20', '0', '0', '0']}
-                        shadow={40}
-                        flexDirection="column"
-                      />
-                    </Element>
-                  </Element>
-                </Element>
-              </Element>
-            </Frame>
+            <EditorContent key={currentPageId} pageContent={currentPage.content} />
           </Viewport>
         </Editor>
       </div>
+    </div>
+  );
+};
+
+export default function Home() {
+  return (
+    <ThemeProvider theme={theme}>
+      <PageProvider>
+        <EditorWrapper />
+      </PageProvider>
     </ThemeProvider>
   );
 }
