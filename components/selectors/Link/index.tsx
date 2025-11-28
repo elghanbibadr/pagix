@@ -1,98 +1,64 @@
 // components/selectors/Link.tsx
-'use client';
-
-import { useNode, useEditor } from '@craftjs/core';
-import React, { useRef, useEffect } from 'react';
+import { useNode } from '@craftjs/core';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 import { usePages } from '@/contexts/PageContext';
+import { LinkSettings } from './LinkSettings';
 
-export interface LinkProps {
-  text?: string;
-  href?: string;
-  linkType?: 'internal' | 'external';
-  targetPageId?: string;
-  openInNewTab?: boolean;
-  fontSize?: string;
-  color?: { r: number; g: number; b: number; a: number };
-  textAlign?: string;
-  margin?: string[];
-  padding?: string[];
-}
-
-export const Link: React.FC<LinkProps> = ({
-  text = 'Click here',
-  href = '#',
-  linkType = 'external',
-  targetPageId,
-  openInNewTab = false,
+export const Link = ({ 
+  text = 'Link text', 
+  targetPage = '',
+  color = '#1976d2',
   fontSize = '16',
-  color = { r: 59, g: 130, b: 246, a: 1 },
-  textAlign = 'left',
-  margin = ['0', '0', '0', '0'],
-  padding = ['0', '0', '0', '0'],
+  textDecoration = 'underline',
+  ...props 
 }) => {
+  const router = useRouter();
+  const { pages, isPreviewMode } = usePages();
+  
   const {
     connectors: { connect, drag },
-    selected,
-  } = useNode((state) => ({
-    selected: state.events.selected,
-  }));
-
-  const { enabled } = useEditor((state) => ({
-    enabled: state.options.enabled,
-  }));
-
-  const { navigateToPage, isPreviewMode } = usePages();
-  const ref = useRef<HTMLAnchorElement>(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      connect(drag(ref.current));
-    }
-  }, [connect, drag]);
+  } = useNode();
 
   const handleClick = (e: React.MouseEvent) => {
-    // In edit mode, prevent navigation
-    if (enabled && !isPreviewMode) {
+    if (isPreviewMode && targetPage) {
       e.preventDefault();
-      return;
-    }
-
-    // In preview/production mode, allow navigation
-    e.preventDefault();
-    
-    if (linkType === 'internal' && targetPageId) {
-      // Navigate to internal page
-      navigateToPage(targetPageId);
-    } else if (linkType === 'external' && href) {
-      // Open external link
-      if (openInNewTab) {
-        window.open(href, '_blank', 'noopener,noreferrer');
-      } else {
-        window.location.href = href;
+      const page = pages.find(p => p.id === targetPage);
+      if (page) {
+        router.push(`/editor/${page.id}`);
       }
     }
   };
 
   return (
     
-     <a ref={ref}
-      href={href}
+     <a ref={(ref) => connect(drag(ref))}
+      href="about"
       onClick={handleClick}
-      className={`cursor-pointer hover:underline transition-colors ${
-        selected ? 'outline outline-2 outline-blue-500' : ''
-      }`}
       style={{
+        color,
         fontSize: `${fontSize}px`,
-        color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
-        textAlign: textAlign as any,
-        margin: `${margin[0]}px ${margin[1]}px ${margin[2]}px ${margin[3]}px`,
-        padding: `${padding[0]}px ${padding[1]}px ${padding[2]}px ${padding[3]}px`,
+        textDecoration,
+        cursor: 'pointer',
         display: 'inline-block',
-        textDecoration: 'none',
-        pointerEvents: enabled && !isPreviewMode ? 'none' : 'auto',
       }}
+      {...props}
     >
       {text}
     </a>
   );
+};
+
+Link.craft = {
+  displayName: 'Link',
+  props: {
+    text: 'Link text',
+    targetPage: '',
+    color: '#1976d2',
+    fontSize: '16',
+    textDecoration: 'underline',
+  },
+  related: {
+    toolbar: LinkSettings, // We'll create this next
+  },
 };

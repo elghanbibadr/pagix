@@ -8,6 +8,7 @@ import { Button } from '../../selectors/Button';
 import { Container } from '../../selectors/Container';
 import { Text } from '../../selectors/Text';
 import { Video } from '../../selectors/Video';
+import { Link } from '@/components/selectors/Link';
 
 const ToolboxDiv = styled.div<{ $enabled: boolean }>`
   transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
@@ -118,6 +119,22 @@ export const Toolbox = () => {
               <Image
                 src="/icons/toolbox/video-line.svg"
                 alt="Video"
+                width={28}
+                height={28}
+              />
+            </Item>
+          </Tooltip>
+        </div>
+         <div
+          ref={(ref) => {
+            create(ref, <Link text="Link" targetPage="" />);
+          }}
+        >
+          <Tooltip title="Link" placement="right">
+            <Item $move>
+              <Image
+                src="/icons/toolbox/link.svg"
+                alt="Link"
                 width={28}
                 height={28}
               />

@@ -4,8 +4,7 @@
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
-import { success } from "zod";
-import { cookies } from "next/headers";
+
 import { getLocale } from "next-intl/server";
 
 export async function login(formData: FormData) {

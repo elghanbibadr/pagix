@@ -8,7 +8,7 @@ export const ButtonSettings = () => {
     <React.Fragment>
       <ToolbarSection
         title="Colors"
-        props={['background', 'color']}
+        props={[ 'color']}
         summary={({ background, color }: any) => {
           return (
             <div className="flex flex-row-reverse">

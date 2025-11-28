@@ -4,8 +4,11 @@ import { Plus, Grid3x3, Search } from "lucide-react"
 import PageCard from "@/components/dashboard/page-card"
 import TemplateGrid from "@/components/dashboard/template-grid"
 import { useTranslations } from "next-intl"
+import { CreateProjectModal } from "@/components/ui/create-project-modal"
 
 export default function DashboardPage() {
+
+  
   const t = useTranslations("dashboard");
 
   const pages = [
@@ -25,12 +28,13 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-4 mb-12">
-          <Link href="/builder?template=blank">
-            <Button className="w-full h-24 text-lg gap-2" size="lg">
+          <CreateProjectModal />
+          {/* <Link href="/builder?template=blank"> */}
+            {/* <Button className="w-full h-24 text-lg gap-2" size="lg">
               <Plus className="w-5 h-5" />
               {t("quickActions.createBlank")}
-            </Button>
-          </Link>
+            </Button> */}
+          {/* </Link> */}
           <Link href="/builder?template=select">
             <Button variant="outline" className="w-full h-24 text-lg gap-2 bg-transparent" size="lg">
               <Grid3x3 className="w-5 h-5" />
