@@ -27,7 +27,7 @@ export default async function BuilderPage({
   return (
     <BuilderClient
       initialWebsite={websites.data}
-      initialPages={[]}
+      initialPages={pages.data}
       websiteId={websiteId}
     />
   );

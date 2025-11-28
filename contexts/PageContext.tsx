@@ -62,11 +62,13 @@ export const PageProvider: React.FC<{
   const [pages, setPages] = useState<Page[]>(initialPages || []);
   const [isLoading, setIsLoading] = useState(!initialWebsite); // Not loading if we have data
 
-  const [currentPageId, setCurrentPageId] = useState('');
+  const [currentPageId, setCurrentPageId] = useState(initialPages[0].id);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const router = useRouter();
   const hasLoadedRef = useRef(false); // Track if we've already loaded
 
+console.log('website from context',website)
+console.log('pages from context',pages)
 
   // Add new page to database
   const addPage = useCallback(async (name: string) => {

@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 
 import { Viewport, RenderNode } from '@/components/editor';
-import { Container } from '@/components/selectors';
+import { Container, Text } from '@/components/selectors';
 import { Button } from '@/components/selectors/Button';
 import { ButtonLink } from '@/components/selectors/ButtonLink';
 import { Link as CustomLink } from '@/components/selectors/Link';
@@ -84,6 +84,8 @@ const EditorWrapper: React.FC = () => {
     setPreviewMode(newPreviewState);
   };
 
+  console.log('current page',currentPage)
+
   return (
     <div className="h-screen flex flex-col">
       {/* Top Bar */}
@@ -112,12 +114,13 @@ const EditorWrapper: React.FC = () => {
       </div>
 
       {/* Page Navigation */}
-      <PageNavigation />
+      {/* <PageNavigation /> */}
 
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
         <Editor
           resolver={{
+            Text,
             Container,
             Button,
             CustomLink,

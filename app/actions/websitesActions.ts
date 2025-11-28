@@ -83,7 +83,7 @@ const user=await getUser()
       website_id: website.id,
       name: 'Home',
       slug: 'home',
-      content: {},
+      content: '',
       is_home_page: true,
       order_index: 0,
     });
