@@ -56,6 +56,7 @@ const EditorWrapper: React.FC = () => {
   const [isPreview, setIsPreview] = useState(false);
 
   console.log('📄 Current page:', currentPage?.name, 'ID:', currentPageId);
+  console.log('current page content',currentPage.content)
 
   if (isLoading) {
     return (
@@ -114,7 +115,6 @@ const EditorWrapper: React.FC = () => {
       </div>
 
       {/* Page Navigation */}
-      {/* <PageNavigation /> */}
 
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
@@ -129,6 +129,8 @@ const EditorWrapper: React.FC = () => {
           enabled={!isPreview}
           onRender={RenderNode}
         >
+      <PageNavigation />
+
           <Viewport>
             <EditorContent key={currentPageId} pageContent={currentPage.content} />
           </Viewport>

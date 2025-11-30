@@ -78,10 +78,31 @@ console.log('pages from context',pages)
     }
 
     try {
+          // Local-only temporary ID
+    const tempId = crypto.randomUUID();
+
+    const now = new Date().toISOString();
       const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       console.log('Creating page:', name);
       
       // TODO: Use your createPage server action here
+        setPages(prev => [
+      ...prev,
+      {
+        id: tempId,
+        website_id: website.id,
+        name,
+        slug,
+        content: '',
+        is_home_page: false,
+        is_published: false,
+        meta_title: null,
+        meta_description: null,
+        order_index: prev.length, // or custom
+        created_at: now,
+        updated_at: now,
+      }
+    ]);
       
     } catch (error) {
       console.error('Error adding page:', error);
@@ -166,13 +187,6 @@ console.log('pages from context',pages)
 
   const currentPage = pages.find((p) => p.id === currentPageId);
 
-  console.log('📊 Context State:', {
-    website: website?.name,
-    pagesCount: pages.length,
-    currentPageId,
-    currentPageName: currentPage?.name,
-    isLoading,
-  });
 
   return (
     <PageContext.Provider
