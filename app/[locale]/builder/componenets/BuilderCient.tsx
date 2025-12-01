@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/[locale]/dashboard/builder/BuilderClient.tsx
 'use client';
 
@@ -9,7 +10,6 @@ import Link from 'next/link';
 import { Viewport, RenderNode } from '@/components/editor';
 import { Container, Text } from '@/components/selectors';
 import { Button } from '@/components/selectors/Button';
-import { ButtonLink } from '@/components/selectors/ButtonLink';
 import { Link as CustomLink } from '@/components/selectors/Link';
 import { PageProvider, usePages } from '@/contexts/PageContext';
 import { PageNavigation } from '@/components/PageNavigation';
@@ -123,7 +123,6 @@ const EditorWrapper: React.FC = () => {
             Container,
             Button,
             CustomLink,
-            ButtonLink,
           }}
           enabled={!isPreview}
           onRender={RenderNode}

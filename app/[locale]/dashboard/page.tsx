@@ -6,7 +6,6 @@ import TemplateGrid from "@/components/dashboard/template-grid"
 import { CreateProjectModal } from "@/components/ui/create-project-modal"
 import { getTranslations } from "next-intl/server"
 import { getUserWebsites } from "@/app/actions/websitesActions"
-import DashboardClient from "@/components/dashboard/dashboard-client"
 import UserWebsites from "@/components/user-websites"
 
 export function formatDate(timestamp: string): string {

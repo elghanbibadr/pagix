@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { usePages } from '@/contexts/PageContext';
 import { LinkSettings } from './LinkSettings';
-
 export const Link = ({ 
   text = 'Link text', 
   targetPage = '',
@@ -20,6 +19,14 @@ export const Link = ({
     connectors: { connect, drag },
   } = useNode();
 
+  const linkRef = React.useRef<HTMLAnchorElement>(null);
+
+  React.useEffect(() => {
+    if (linkRef.current) {
+      connect(drag(linkRef.current));
+    }
+  }, [connect, drag]);
+
   const handleClick = (e: React.MouseEvent) => {
     if (isPreviewMode && targetPage) {
       e.preventDefault();
@@ -31,9 +38,9 @@ export const Link = ({
   };
 
   return (
-    
-     <a ref={(ref) => connect(drag(ref))}
-      href="about"
+    <a 
+      ref={linkRef}
+      href="#"
       onClick={handleClick}
       style={{
         color,
@@ -47,18 +54,4 @@ export const Link = ({
       {text}
     </a>
   );
-};
-
-Link.craft = {
-  displayName: 'Link',
-  props: {
-    text: 'Link text',
-    targetPage: '',
-    color: '#1976d2',
-    fontSize: '16',
-    textDecoration: 'underline',
-  },
-  related: {
-    toolbar: LinkSettings, // We'll create this next
-  },
 };

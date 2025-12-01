@@ -4,7 +4,6 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { getUser } from "./actions";
-import { WeekNumber } from "react-day-picker";
 
 
 export async function getUserWebsites() {
@@ -12,7 +11,6 @@ export async function getUserWebsites() {
     const supabase =await  createClient();
 const user=await getUser()
      
-    // Generate domain from project name
 
     const {data:website,error}=await supabase
     .from('websites')
@@ -62,38 +60,7 @@ const user=await getUser()
       .eq('domain', domain)
       .single();
 
-    // if (existingWebsite) {
-    //   // If domain exists, append random string
-    //   const randomSuffix = Math.random().toString(36).substring(2, 6);
-    //   const uniquedomain = `${domain}-${randomSuffix}`;
-
-    //   const { data: website, error } = await supabase
-    //     .from('websites')
-    //     .insert({
-    //       user_id: data.userId,
-    //       name: data.name,
-    //       domain: uniquedomain,
-    //       description: data.description || null,
-    //     })
-    //     .select()
-    //     .single();
-
-    //   if (error) throw error;
-
-    //   // Create default home page
-    //   await supabase.from('pages').insert({
-    //     website_id: website.id,
-    //     name: 'Home',
-    //     slug: 'home',
-    //     content: {},
-    //     is_home_page: true,
-    //     order_index: 0,
-    //   });
-
-    //   return { success: true, data: website };
-    // }
-
-    // Create website with original domain
+   
     const { data: website, error } = await supabase
       .from('websites')
       .insert({
@@ -168,9 +135,7 @@ export async function loadWebsite(websiteId: string) {
   }
 }
 
-// app/actions/websitesActions.ts
 
-// Delete page
 export const deletePageAction = async (pageId: string) => {
   const supabase = await createClient();
 
@@ -262,7 +227,6 @@ export const addPageAction = async (
   }
 };
 
-  // ============= GET PAGES FOR A WEBSITE =============
 
 export async function getPagesByWebsiteId(
   websiteId: string
@@ -302,8 +266,6 @@ export async function getPagesByWebsiteId(
   }
 }
 
-// app/actions/pagesActions.ts
-
 
 // Update page content
 export const updatePageContentAction = async (pageId: string, content: any) => {
@@ -323,11 +285,11 @@ export const updatePageContentAction = async (pageId: string, content: any) => {
 
     if (error) throw error;
 
-    console.log('✅ Page content updated:', data);
+    console.log(' Page content updated:', data);
     return data;
     
   } catch (error) {
-    console.error('❌ Error updating page content:', error);
+    console.error(' Error updating page content:', error);
     throw error;
   }
 };
@@ -359,11 +321,11 @@ export const updatePageMeta = async (
 
     if (error) throw error;
 
-    console.log('✅ Page metadata updated:', data);
+    console.log(' Page metadata updated:', data);
     return data;
     
   } catch (error) {
-    console.error('❌ Error updating page metadata:', error);
+    console.error(' Error updating page metadata:', error);
     throw error;
   }
 };
@@ -380,11 +342,11 @@ export const deletePage = async (pageId: string) => {
 
     if (error) throw error;
 
-    console.log('✅ Page deleted:', pageId);
+    console.log('Page deleted:', pageId);
     return { success: true };
     
   } catch (error) {
-    console.error('❌ Error deleting page:', error);
+    console.error(' Error deleting page:', error);
     throw error;
   }
 };

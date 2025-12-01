@@ -57,6 +57,7 @@ console.log("user",user)
       setIsSubmitting(false)
     }
   }
+  
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -81,9 +82,9 @@ console.log("user",user)
   }
   return (
 
-    <>
+    <div className="h-full w-full">
     
-      <Button size="lg" onClick={() => setIsModalOpen(true)} className="mt-8">
+      <Button size="lg" onClick={() => setIsModalOpen(true)} className="w-full h-full">
           Start from a Blank Template
         </Button>
     <Dialog open={isModalOpen} onOpenChange={handleOpenChange} >
@@ -129,6 +130,6 @@ console.log("user",user)
         </form>
       </DialogContent>
     </Dialog>
-    </>
+    </div>
   )
 }

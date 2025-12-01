@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // contexts/PageContext.tsx
 'use client';
@@ -67,7 +68,7 @@ export const PageProvider: React.FC<{
   websiteId?: string;
   initialWebsite?: Website;
   initialPages?: Page[];
-}> = ({ children, websiteId, initialWebsite, initialPages }) => {
+}> = ({ children, initialWebsite, initialPages }) => {
   const [website, setWebsite] = useState<Website | null>(initialWebsite || null);
   const [pages, setPages] = useState<Page[]>(initialPages || []);
   const [isLoading, setIsLoading] = useState(!initialWebsite);
