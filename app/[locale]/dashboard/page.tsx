@@ -3,13 +3,25 @@ import { Button } from "@/components/ui/button"
 import { Plus, Grid3x3, Search } from "lucide-react"
 import PageCard from "@/components/dashboard/page-card"
 import TemplateGrid from "@/components/dashboard/template-grid"
-import { useTranslations } from "next-intl"
 import { CreateProjectModal } from "@/components/ui/create-project-modal"
+import { getTranslations } from "next-intl/server"
+import { getUserWebsites } from "@/app/actions/websitesActions"
 
-export default function DashboardPage() {
-
+export function formatDate(timestamp: string): string {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   
-  const t = useTranslations("dashboard");
+  return `${year}-${month}-${day}`;
+}
+
+export default async function DashboardPage() {
+const userWebsites=await getUserWebsites()
+
+console.log('user websites',userWebsites)
+  
+  const t =await getTranslations("dashboard");
 
   const pages = [
     { title: "Portfolio", date: "Updated 2 days ago", status: "published" },
@@ -60,12 +72,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {pages.map((page, i) => (
+            {userWebsites.data.map((page, i) => (
               <PageCard
                 key={i}
-                title={page.title}
-                date={page.date}
-                status={t(`myPages.statuses.${page.status}`)}
+                website_id={page.id}
+                title={page.name}
+                date={ formatDate(page.updated_at)}
+                status={t(`myPages.statuses.${ page.is_published ? 'published':'draft'}`)}
               />
             ))}
           </div>

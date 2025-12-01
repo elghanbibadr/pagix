@@ -1,11 +1,13 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Button } from '@/components/ui/button';
 import { useEditor } from '@craftjs/core';
 import { Tooltip } from '@mui/material';
 import cx from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled } from 'styled-components';
+import { usePages } from '@/contexts/PageContext';
 
 const HeaderDiv = styled.div`
   width: 100%;
@@ -50,18 +52,70 @@ const Item = styled.a<{ disabled?: boolean }>`
 `;
 
 export const Header = () => {
-  const { query } = useEditor();
+  const { query, actions } = useEditor();
+  const { saveAllChanges, hasUnsavedChanges, isSaving, currentPageId, updatePageContent } = usePages();
+  const [hasEditorChanges, setHasEditorChanges] = useState(false);
 
-  const { enabled, canUndo, canRedo, actions } = useEditor((state, query) => ({
+  const { enabled, canUndo, canRedo } = useEditor((state, query) => ({
     enabled: state.options.enabled,
     canUndo: query.history.canUndo(),
     canRedo: query.history.canRedo(),
   }));
 
+  // ✅ Reset editor changes flag when page switches or edit mode changes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHasEditorChanges(false);
+  }, [currentPageId, enabled]);
+
+  // ✅ Mark as changed when undo/redo is used (indicates editing)
+  useEffect(() => {
+    if (enabled && (canUndo || canRedo)) {
+      setHasEditorChanges(true);
+    }
+  }, [canUndo, canRedo, enabled]);
+
+ const handleSave = async () => {
+  try {
+    console.log('💾 Save button clicked');
+    
+    // Get the current editor state
+    const json = query.serialize();
+    
+    console.log('📝 Editor content:', {
+      type: typeof json,
+      length: typeof json === 'string' ? json.length : 'N/A',
+      currentPageId
+    });
+    
+    // ✅ Pass content directly to saveAllChanges - it handles everything
+    await saveAllChanges({
+      pageId: currentPageId,
+      content: json
+    });
+    
+    // Reset the editor changes flag after successful save
+    setHasEditorChanges(false);
+    
+    console.log('✅ Changes saved successfully');
+  } catch (error) {
+    console.error('❌ Failed to save changes:', error);
+    alert('Failed to save changes. Please try again.');
+  }
+};
+
+  const handleFinishEditing = () => {
+    if (hasUnsavedChanges || hasEditorChanges) {
+      const confirmLeave = confirm('You have unsaved changes. Do you want to continue without saving?');
+      if (!confirmLeave) return;
+    }
+    
+    actions.setOptions((options) => (options.enabled = !enabled));
+  };
+
   const handlePreview = () => {
     const json = query.serialize();
     
-    // Create a blob URL with the preview HTML
     const previewHTML = `
 <!DOCTYPE html>
 <html lang="en">
@@ -91,24 +145,23 @@ export const Header = () => {
   </div>
   <div id="root"></div>
   <script type="module">
-    // Preview content will be rendered here
     const data = ${JSON.stringify(json)};
     console.log('Preview data:', data);
-    
-    // Display a simple representation
     document.getElementById('root').innerHTML = '<div style="padding: 2rem;"><pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
   </script>
 </body>
 </html>
     `;
     
-    // Open in new window
     const previewWindow = window.open('', '_blank');
     if (previewWindow) {
       previewWindow.document.write(previewHTML);
       previewWindow.document.close();
     }
   };
+
+  // ✅ Show unsaved indicator if either context has changes OR editor was modified
+  const showUnsavedIndicator = hasUnsavedChanges || hasEditorChanges;
 
   return (
     <HeaderDiv className="header text-white transition w-full">
@@ -137,7 +190,54 @@ export const Header = () => {
             </Tooltip>
           </div>
         )}
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {/* Show unsaved changes indicator */}
+          {showUnsavedIndicator && (
+            <span className="text-orange-600 text-sm font-medium flex items-center gap-1">
+              <span className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></span>
+              Unsaved changes
+            </span>
+          )}
+          
+          {/* Save Button - Always enabled when editing */}
+          {enabled && (
+            <Btn
+              className={cx([
+                'transition cursor-pointer',
+                {
+                  'bg-blue-500': showUnsavedIndicator,
+                  'bg-gray-400': !showUnsavedIndicator,
+                },
+              ])}
+              onClick={handleSave}
+              style={{ 
+                opacity: isSaving ? 0.6 : 1,
+                pointerEvents: isSaving ? 'none' : 'auto'
+              }}
+            >
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin h-3 w-3 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Image
+                    src="/icons/check.svg"
+                    alt="Save"
+                    width={12}
+                    height={12}
+                  />
+                  Save
+                </>
+              )}
+            </Btn>
+          )}
+          
+          {/* Finish Editing / Edit Button */}
           <Btn
             className={cx([
               'transition cursor-pointer',
@@ -146,29 +246,38 @@ export const Header = () => {
                 'bg-primary': !enabled,
               },
             ])}
-            onClick={() => {
-              actions.setOptions((options) => (options.enabled = !enabled));
-            }}
+            onClick={handleFinishEditing}
           >
             {enabled ? (
-              <Image
-                src="/icons/check.svg"
-                alt="Checkmark"
-                width={12}
-                height={12}
-              />
+              <>
+                <Image
+                  src="/icons/customize.svg"
+                  alt="Finish"
+                  width={12}
+                  height={12}
+                />
+                Finish Editing
+              </>
             ) : (
-              <Image
-                src="/icons/customize.svg"
-                alt="Customize"
-                width={12}
-                height={12}
-              />
+              <>
+                <Image
+                  src="/icons/customize.svg"
+                  alt="Customize"
+                  width={12}
+                  height={12}
+                />
+                Edit
+              </>
             )}
-            {enabled ? 'Finish Editing' : 'Edit'}
           </Btn>
-          <Btn onClick={handlePreview} className='bg-black cursor-pointer text-white'>Preview</Btn>
-          <Link href="/dashboard"><Button> Go back </Button></Link> 
+          
+          <Btn onClick={handlePreview} className='bg-black cursor-pointer text-white'>
+            Preview
+          </Btn>
+          
+          <Link href="/dashboard">
+            <Button> Go back </Button>
+          </Link> 
         </div>
       </div>
     </HeaderDiv>

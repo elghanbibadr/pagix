@@ -55,8 +55,7 @@ const EditorWrapper: React.FC = () => {
   const { setPreviewMode, currentPage, currentPageId, isLoading } = usePages();
   const [isPreview, setIsPreview] = useState(false);
 
-  console.log('📄 Current page:', currentPage?.name, 'ID:', currentPageId);
-  console.log('current page content',currentPage.content)
+
 
   if (isLoading) {
     return (

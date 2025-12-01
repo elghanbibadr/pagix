@@ -6,9 +6,10 @@ interface PageCardProps {
   title: string
   date: string
   status:string
+  website_id:string
 }
 
-export default function PageCard({ title, date, status }: PageCardProps) {
+export default function PageCard({ title, date, status,website_id }: PageCardProps) {
   return (
     <div className="border border-border rounded-lg overflow-hidden hover:border-primary transition-colors group">
       {/* Thumbnail */}
@@ -42,7 +43,7 @@ export default function PageCard({ title, date, status }: PageCardProps) {
           </button>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-3">{date}</p>
+        <p className="text-sm text-muted-foreground mb-3"> updated at {date}</p>
 
         <div className="flex items-center justify-between">
           <span
@@ -54,7 +55,7 @@ export default function PageCard({ title, date, status }: PageCardProps) {
           >
             {status}
           </span>
-          <Link href={`/builder?page=${title.toLowerCase()}`}>
+          <Link href={`/builder?websiteId=${website_id}`}>
             <Button size="sm" variant="ghost">
               Edit
             </Button>

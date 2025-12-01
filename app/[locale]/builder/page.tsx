@@ -26,7 +26,7 @@ export default async function BuilderPage({
   // Pass data to client component
   return (
     <BuilderClient
-      initialWebsite={websites.data}
+      initialWebsite={websites.data.website}
       initialPages={pages.data}
       websiteId={websiteId}
     />
