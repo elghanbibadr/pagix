@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // contexts/PageContext.tsx
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { addPageAction, updatePageContentAction } from '@/app/actions/websitesActions';
+import { addPageAction, deletePageAction, updatePageContentAction } from '@/app/actions/websitesActions';
 
 interface Page {
   id: string;
@@ -54,7 +55,7 @@ interface PageContextType {
   switchPage: (id: string) => void;
   updatePageContent: (id: string, content: any) => void;
   saveAllChanges: (currentEditorContent?: { pageId: string; content: any }) => Promise<void>; // ✅ Add optional param
-  setPreviewMode: (enabled: boolean) => void;
+  setPreviewMode?: (enabled: boolean) => void;
   navigateToPage: (pageId: string) => void;
   setHomePage: (pageId: string) => Promise<void>;
 }
@@ -484,8 +485,16 @@ const updatePageContent = useCallback((id: string, content: any) => {
           break;
 
         case 'deleted':
-          console.log('✅ Page deleted');
-          break;
+  console.log('🗑️ Deleting page:', realPageId);
+  
+  if (!realPageId.startsWith('temp_')) {
+    await deletePageAction(realPageId); 
+    console.log('✅ Page deleted from database');
+  } else {
+    console.log('⏭️ Skipping delete for temp page (never created)');
+  }
+  break;
+
       }
     }
 
@@ -501,6 +510,8 @@ const updatePageContent = useCallback((id: string, content: any) => {
 }, [pendingChanges, currentPageId, pages]);
   const currentPage = pages.find((p) => p.id === currentPageId);
 
+
+  console.log('context running')
   return (
     <PageContext.Provider
       value={{
@@ -518,7 +529,7 @@ const updatePageContent = useCallback((id: string, content: any) => {
         switchPage,
         updatePageContent,
         saveAllChanges,
-        setIsPreviewMode,
+        // setIsPreviewMode,
         navigateToPage,
         pendingChanges,
         setHomePage,

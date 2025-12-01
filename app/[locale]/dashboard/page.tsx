@@ -6,6 +6,8 @@ import TemplateGrid from "@/components/dashboard/template-grid"
 import { CreateProjectModal } from "@/components/ui/create-project-modal"
 import { getTranslations } from "next-intl/server"
 import { getUserWebsites } from "@/app/actions/websitesActions"
+import DashboardClient from "@/components/dashboard/dashboard-client"
+import UserWebsites from "@/components/user-websites"
 
 export function formatDate(timestamp: string): string {
   const date = new Date(timestamp);
@@ -17,21 +19,15 @@ export function formatDate(timestamp: string): string {
 }
 
 export default async function DashboardPage() {
-const userWebsites=await getUserWebsites()
+  const userWebsites = await getUserWebsites()
 
-console.log('user websites',userWebsites)
+  console.log('user websites', userWebsites)
   
-  const t =await getTranslations("dashboard");
-
-  const pages = [
-    { title: "Portfolio", date: "Updated 2 days ago", status: "published" },
-    { title: "Landing Page", date: "Updated 1 week ago", status: "draft" },
-    { title: "Blog", date: "Updated 3 days ago", status: "published" }
-  ];
+  const t = await getTranslations("dashboard");
 
   return (
     <div className="min-h-screen bg-background">
-      <main className=" mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Welcome */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold mb-2">{t("welcome.title")}</h1>
@@ -41,12 +37,6 @@ console.log('user websites',userWebsites)
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-4 mb-12">
           <CreateProjectModal />
-          {/* <Link href="/builder?template=blank"> */}
-            {/* <Button className="w-full h-24 text-lg gap-2" size="lg">
-              <Plus className="w-5 h-5" />
-              {t("quickActions.createBlank")}
-            </Button> */}
-          {/* </Link> */}
           <Link href="/builder?template=select">
             <Button variant="outline" className="w-full h-24 text-lg gap-2 bg-transparent" size="lg">
               <Grid3x3 className="w-5 h-5" />
@@ -55,34 +45,16 @@ console.log('user websites',userWebsites)
           </Link>
         </div>
 
-        {/* My Pages */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">{t("myPages.title")}</h2>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder={t("myPages.searchPlaceholder")}
-                  className="pl-10 pr-4 py-2 border border-border rounded-lg bg-background"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {userWebsites.data.map((page, i) => (
-              <PageCard
-                key={i}
-                website_id={page.id}
-                title={page.name}
-                date={ formatDate(page.updated_at)}
-                status={t(`myPages.statuses.${ page.is_published ? 'published':'draft'}`)}
-              />
-            ))}
-          </div>
-        </div>
+        {/* My Pages - Client Component with Search */}
+        <UserWebsites 
+          websites={userWebsites.data} 
+          translations={{
+            title: t("myPages.title"),
+            searchPlaceholder: t("myPages.searchPlaceholder"),
+            publishedStatus: t("myPages.statuses.published"),
+            draftStatus: t("myPages.statuses.draft")
+          }}
+        />
 
         {/* Templates */}
         <div>

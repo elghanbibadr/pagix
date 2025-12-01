@@ -1,11 +1,10 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { Button } from '@/components/ui/button';
 import { useEditor } from '@craftjs/core';
 import { Tooltip } from '@mui/material';
 import cx from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { styled } from 'styled-components';
 import { usePages } from '@/contexts/PageContext';
 
@@ -53,8 +52,7 @@ const Item = styled.a<{ disabled?: boolean }>`
 
 export const Header = () => {
   const { query, actions } = useEditor();
-  const { saveAllChanges, hasUnsavedChanges, isSaving, currentPageId, updatePageContent } = usePages();
-  const [hasEditorChanges, setHasEditorChanges] = useState(false);
+  const { saveAllChanges, hasUnsavedChanges, isSaving, currentPageId } = usePages();
 
   const { enabled, canUndo, canRedo } = useEditor((state, query) => ({
     enabled: state.options.enabled,
@@ -62,50 +60,23 @@ export const Header = () => {
     canRedo: query.history.canRedo(),
   }));
 
-  // ✅ Reset editor changes flag when page switches or edit mode changes
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasEditorChanges(false);
-  }, [currentPageId, enabled]);
-
-  // ✅ Mark as changed when undo/redo is used (indicates editing)
-  useEffect(() => {
-    if (enabled && (canUndo || canRedo)) {
-      setHasEditorChanges(true);
+  const handleSave = async () => {
+    try {
+      
+      const json = query.serialize();
+      
+      await saveAllChanges({
+        pageId: currentPageId,
+        content: json
+      });
+      
+    } catch (error) {
+      console.error(' Failed to save changes:', error);
     }
-  }, [canUndo, canRedo, enabled]);
-
- const handleSave = async () => {
-  try {
-    console.log('💾 Save button clicked');
-    
-    // Get the current editor state
-    const json = query.serialize();
-    
-    console.log('📝 Editor content:', {
-      type: typeof json,
-      length: typeof json === 'string' ? json.length : 'N/A',
-      currentPageId
-    });
-    
-    // ✅ Pass content directly to saveAllChanges - it handles everything
-    await saveAllChanges({
-      pageId: currentPageId,
-      content: json
-    });
-    
-    // Reset the editor changes flag after successful save
-    setHasEditorChanges(false);
-    
-    console.log('✅ Changes saved successfully');
-  } catch (error) {
-    console.error('❌ Failed to save changes:', error);
-    alert('Failed to save changes. Please try again.');
-  }
-};
+  };
 
   const handleFinishEditing = () => {
-    if (hasUnsavedChanges || hasEditorChanges) {
+    if (hasUnsavedChanges) {
       const confirmLeave = confirm('You have unsaved changes. Do you want to continue without saving?');
       if (!confirmLeave) return;
     }
@@ -160,9 +131,6 @@ export const Header = () => {
     }
   };
 
-  // ✅ Show unsaved indicator if either context has changes OR editor was modified
-  const showUnsavedIndicator = hasUnsavedChanges || hasEditorChanges;
-
   return (
     <HeaderDiv className="header text-white transition w-full">
       <div className="items-center flex w-full px-4 justify-end">
@@ -191,24 +159,18 @@ export const Header = () => {
           </div>
         )}
         <div className="flex gap-2 items-center">
-          {/* Show unsaved changes indicator */}
-          {showUnsavedIndicator && (
+          {/* Show unsaved changes indicator only from context */}
+          {hasUnsavedChanges && (
             <span className="text-orange-600 text-sm font-medium flex items-center gap-1">
               <span className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></span>
               Unsaved changes
             </span>
           )}
           
-          {/* Save Button - Always enabled when editing */}
+          {/* Save Button - Always available when editing */}
           {enabled && (
             <Btn
-              className={cx([
-                'transition cursor-pointer',
-                {
-                  'bg-blue-500': showUnsavedIndicator,
-                  'bg-gray-400': !showUnsavedIndicator,
-                },
-              ])}
+              className="transition cursor-pointer bg-blue-500"
               onClick={handleSave}
               style={{ 
                 opacity: isSaving ? 0.6 : 1,
@@ -237,7 +199,6 @@ export const Header = () => {
             </Btn>
           )}
           
-          {/* Finish Editing / Edit Button */}
           <Btn
             className={cx([
               'transition cursor-pointer',

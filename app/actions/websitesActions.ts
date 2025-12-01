@@ -168,6 +168,28 @@ export async function loadWebsite(websiteId: string) {
   }
 }
 
+// app/actions/websitesActions.ts
+
+// Delete page
+export const deletePageAction = async (pageId: string) => {
+  const supabase = await createClient();
+
+  try {
+    const { error } = await supabase
+      .from('pages')
+      .delete()
+      .eq('id', pageId);
+
+    if (error) throw error;
+
+    console.log('✅ Page deleted:', pageId);
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Error deleting page:', error);
+    throw error;
+  }
+};
 
 
 const savePageContent = async (id: string, content: JSON) => {
