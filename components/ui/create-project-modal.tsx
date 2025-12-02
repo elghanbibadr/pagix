@@ -43,43 +43,26 @@ export function CreateProjectModal() {
 
     setIsSubmitting(true)
     try {
-      // onSubmit(projectName, projectDescription)
-      // Reset form
-const user=await getUser()
-console.log("user",user)
+
       // handleCreateProject()
      const website= await createWebsite({ name:projectName,description:projectDescription})
      console.log('website',website)
-      setProjectName("")
-      setProjectDescription("")
+     
        router.push(`/builder?websiteId=${website.data.id}`)
     } finally {
       setIsSubmitting(false)
+       setProjectName("")
+      setProjectDescription("")
     }
   }
   
 
   const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      // onClose()
-    }
+    setIsModalOpen(prv => !prv)
   }
 
 
-  const handleCreateProject = async (projectName: string, projectDescription: string) => {
 
-    // TODO: Save project to database/storage if needed
-    // For now, we'll just pass it via URL params
-    const data = {
-      name: projectName,
-      description: projectDescription,
-    }
-
-    // await createWebsite(data)
-
-    // router.push(`/builder?${params.toString()}`)
-    setIsModalOpen(false)
-  }
   return (
 
     <div className="h-full w-full">

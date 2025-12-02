@@ -92,24 +92,15 @@ const EditorWrapper: React.FC = () => {
       <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Website Editor</h1>
         <div className="flex gap-2">
-          <button
-            onClick={handlePreviewToggle}
-            className={`px-4 py-2 rounded transition-colors ${
-              isPreview
-                ? 'bg-green-600 hover:bg-green-700'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {isPreview ? '✓ Preview Mode' : 'Preview'}
-          </button>
-          {isPreview && (
+       
+          {/* {isPreview && (
             <button
               onClick={handlePreviewToggle}
               className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded"
             >
               Exit Preview
             </button>
-          )}
+          )} */}
         </div>
       </div>
 
