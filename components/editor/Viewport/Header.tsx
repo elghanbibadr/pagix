@@ -7,7 +7,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
 import { usePages } from '@/contexts/PageContext';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Settings } from 'lucide-react';
+import { SettingsView } from '@/components/websitesSettings/view-settings';
 
 const HeaderDiv = styled.div`
   width: 100%;
@@ -64,15 +66,23 @@ const Item = styled.a<{ disabled?: boolean }>`
 export const Header = () => {
   const { query, actions } = useEditor();
   const { saveAllChanges, hasUnsavedChanges, isSaving, currentPageId,pendingChanges } = usePages();
-  const router = useRouter();
   const [showExitDialog, setShowExitDialog] = useState(false);
-
+    const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname(); // ✅ Get current pathname
   const { enabled, canUndo, canRedo } = useEditor((state, query) => ({
     enabled: state.options.enabled,
     canUndo: query.history.canUndo(),
     canRedo: query.history.canRedo(),
   }));
+   const openSettings = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('view', 'settings');
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
+  
   const handleSave = async () => {
     try {
       console.log('💾 Save button clicked');
@@ -190,8 +200,11 @@ export const Header = () => {
 
   console.log('has un',hasUnsavedChanges)
 
+  
+
   return (
     <>
+
       <HeaderDiv className="header text-white transition w-full">
         <div className="items-center flex w-full px-4 justify-end">
           {enabled && (
@@ -226,7 +239,13 @@ export const Header = () => {
                 Unsaved changes
               </span>
             )}
-            
+            <button
+                onClick={openSettings}
+                className="p-2 rounded hover:bg-gray-300 transition inline-flex"
+                title="Page Settings"
+              >
+                <Settings size={20} className="text-gray-700" />
+              </button>
             {/* Save Button - Always available when editing */}
             {enabled && (
               <Btn

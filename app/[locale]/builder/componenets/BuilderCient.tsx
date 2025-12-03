@@ -13,6 +13,8 @@ import { Button } from '@/components/selectors/Button';
 import { Link as CustomLink } from '@/components/selectors/Link';
 import { PageProvider, usePages } from '@/contexts/PageContext';
 import { PageNavigation } from '@/components/PageNavigation';
+import { useSearchParams } from 'next/navigation';
+import { SettingsView } from '@/components/websitesSettings/view-settings';
 
 const theme = createTheme({
   typography: {
@@ -54,6 +56,8 @@ const EditorContent = ({ pageContent }: { pageContent: any }) => {
 const EditorWrapper: React.FC = () => {
   const { setPreviewMode, currentPage, currentPageId, isLoading,setHasUnsavedChanges } = usePages();
   const [isPreview, setIsPreview] = useState(false);
+  const searchParams=useSearchParams()
+  const showSettings = searchParams.get('view') === 'settings';
 
  const isInitialLoadRef = useRef(true); // ✅ Track if this is initial load
 
@@ -126,7 +130,10 @@ const EditorWrapper: React.FC = () => {
       {/* Page Navigation */}
 
       {/* Editor */}
-      <div className="flex-1 overflow-hidden">
+          {showSettings && (
+  <SettingsView onClose={()=>{}} />
+)}
+     {!showSettings && <div className="flex-1 overflow-hidden">
         <Editor
          onNodesChange={handleNodesChange}
           resolver={{
@@ -144,7 +151,7 @@ const EditorWrapper: React.FC = () => {
             <EditorContent key={currentPageId} pageContent={currentPage.content} />
           </Viewport>
         </Editor>
-      </div>
+      </div>}
     </div>
   );
 };
