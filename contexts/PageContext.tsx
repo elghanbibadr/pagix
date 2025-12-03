@@ -59,6 +59,7 @@ interface PageContextType {
   setPreviewMode?: (enabled: boolean) => void;
   navigateToPage: (pageId: string) => void;
   setHomePage: (pageId: string) => Promise<void>;
+  setHasUnsavedChanges:any
 }
 
 const PageContext = createContext<PageContextType | undefined>(undefined);
@@ -75,17 +76,13 @@ export const PageProvider: React.FC<{
   const [isSaving, setIsSaving] = useState(false);
   const [currentPageId, setCurrentPageId] = useState(initialPages?.[0]?.id || '');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  
+  const [hasUnsavedChanges,setHasUnsavedChanges]=useState(false)
   const [pendingChanges, setPendingChanges] = useState<Map<string, PageChange>>(new Map());
-  const hasUnsavedChanges = pendingChanges.size > 0;
+  // const hasUnsavedChanges = pendingChanges.size > 0;
 
+  console.log('has unsaved',hasUnsavedChanges)
   
-  
-  const router = useRouter();
 
-  useEffect(()=>{
-    console.log("pending changes",pendingChanges)
-  },[])
 
 
   // ✅ Use empty string "" as default content
@@ -530,6 +527,7 @@ const updatePageContent = useCallback((id: string, content: any) => {
         switchPage,
         updatePageContent,
         saveAllChanges,
+        setHasUnsavedChanges,
         // setIsPreviewMode,
         navigateToPage,
         pendingChanges,

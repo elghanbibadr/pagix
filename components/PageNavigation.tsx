@@ -45,7 +45,7 @@ export const PageNavigation: React.FC = () => {
   };
 
   const handleSwitching=(pageId:string) =>{
-    // handleSave();
+    handleSave();
     switchPage(pageId)
   }
 

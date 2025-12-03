@@ -4,7 +4,7 @@
 
 import { Editor, Frame, Element } from '@craftjs/core';
 import { createTheme, ThemeProvider } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
 import { Viewport, RenderNode } from '@/components/editor';
@@ -39,7 +39,7 @@ const EditorContent = ({ pageContent }: { pageContent: any }) => {
       <Element
         canvas
         is={Container}
-        width="800px"
+        width="100%"
         height="auto"
         background={{ r: 255, g: 255, b: 255, a: 1 }}
         padding={['40', '40', '40', '40']}
@@ -52,10 +52,29 @@ const EditorContent = ({ pageContent }: { pageContent: any }) => {
 };
 
 const EditorWrapper: React.FC = () => {
-  const { setPreviewMode, currentPage, currentPageId, isLoading } = usePages();
+  const { setPreviewMode, currentPage, currentPageId, isLoading,setHasUnsavedChanges } = usePages();
   const [isPreview, setIsPreview] = useState(false);
 
+ const isInitialLoadRef = useRef(true); // ✅ Track if this is initial load
 
+  const handleNodesChange = () => {
+    // ✅ Skip the first call (initial load)
+    if (isInitialLoadRef.current) {
+      console.log('⏭️ Skipping initial nodes setup');
+      isInitialLoadRef.current = false;
+      return;
+    }
+
+    setHasUnsavedChanges(true)
+
+    console.log('✏️ Nodes changed by user');
+    // You can perform actions here, like marking as unsaved
+  };
+
+  // ✅ Reset the flag when page changes
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+  }, [currentPageId]);
 
   if (isLoading) {
     return (
@@ -109,6 +128,7 @@ const EditorWrapper: React.FC = () => {
       {/* Editor */}
       <div className="flex-1 overflow-hidden">
         <Editor
+         onNodesChange={handleNodesChange}
           resolver={{
             Text,
             Container,
@@ -118,7 +138,7 @@ const EditorWrapper: React.FC = () => {
           enabled={!isPreview}
           onRender={RenderNode}
         >
-      <PageNavigation />
+      {/* <PageNavigation /> */}
 
           <Viewport>
             <EditorContent key={currentPageId} pageContent={currentPage.content} />
