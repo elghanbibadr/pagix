@@ -4,6 +4,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { getUser } from "./actions";
+import { revalidatePath } from "next/cache";
 
 
 export async function getUserWebsites() {
@@ -347,6 +348,43 @@ export const deletePage = async (pageId: string) => {
     
   } catch (error) {
     console.error(' Error deleting page:', error);
+    throw error;
+  }
+};
+
+export const updatePageMetaAction = async (
+  pageId: string, 
+  updates: {
+    name?: string;
+    slug?: string;
+    meta_title?: string;
+    meta_description?: string;
+    is_published?: boolean;
+    is_home_page?: boolean;
+  }
+) => {
+  const supabase = await createClient();
+
+  try {
+    const { data, error } = await supabase
+      .from('pages')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', pageId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    revalidatePath("/builder")
+
+    console.log('✅ Page metadata updated:', data);
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Error updating page metadata:', error);
     throw error;
   }
 };

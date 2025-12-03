@@ -14,6 +14,7 @@ import {
   Settings as SettingsIcon
 } from 'lucide-react';
 import { usePages } from '@/contexts/PageContext';
+import { updatePageMetaAction } from '@/app/actions/websitesActions';
 
 interface SettingsViewProps {
   onClose: () => void;
@@ -29,8 +30,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     title: currentPage?.name || '',
     url: currentPage?.slug || '',
     description: currentPage?.meta_description || '',
-    showInSearch: true,
-    showInSiteSearch: true,
+  
   });
 
   // Update settings when selected page changes
@@ -40,34 +40,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
       setPageSettings({
         title: page.name || '',
         url: page.slug || '',
-        description: page.meta_description || '',
-        showInSearch: true,
-        showInSiteSearch: true,
+        description: page.meta_description || ''
+  
       });
     }
   }, [selectedPage, pages]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log('Saving settings:', pageSettings);
     // TODO: Implement save to database
+    await updatePageMetaAction(selectedPage,{name:pageSettings.title,slug:pageSettings.url, meta_description:pageSettings.description})
     onClose();
   };
 
   const siteSettingsMenu = [
     { id: 'general', label: 'General', icon: Globe },
     { id: 'domains', label: 'Domains', icon: LinkIcon },
-    { id: 'redirects', label: 'Redirects', icon: LinkIcon },
-    { id: 'forms', label: 'Forms', icon: FileText },
-    { id: 'staging', label: 'Staging & Versions', icon: Code },
-    { id: 'usage', label: 'Usage', icon: FileType },
-    { id: 'plans', label: 'Plans', icon: FileCode },
+
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[100000] flex items-center justify-center">
+    <div className="-0 bg-white bg-opacity-50 z-[100000] flex items-center justify-center">
       <div className="bg-white w-full max-w-7xl h-[90vh] rounded-lg shadow-2xl flex overflow-hidden">
         {/* Sidebar */}
-        <div className="w-64 bg-gray-900 text-white p-4 overflow-y-auto">
+        <div className="w-64 bg-white text-white p-4 overflow-y-auto">
           {/* Site Settings */}
           <div className="mb-6">
             <h3 className="text-xs font-semibold text-gray-400 uppercase mb-3 px-2">
@@ -156,7 +152,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
                   URL
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-sm">/</span>
+                  {/* <span className="text-gray-500 text-sm">/</span> */}
                   <input
                     type="text"
                     value={pageSettings.url}
@@ -181,48 +177,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
                 />
               </div>
 
-              {/* Search Options */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Search
-                </label>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={pageSettings.showInSearch}
-                      onChange={(e) => setPageSettings({ ...pageSettings, showInSearch: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">Show page in search engines</span>
-                  </label>
-                  <label className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={pageSettings.showInSiteSearch}
-                      onChange={(e) => setPageSettings({ ...pageSettings, showInSiteSearch: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">Show page in Site Search</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Preview */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                  Preview
-                </h4>
-                <div className="space-y-2">
-                  <div className="text-blue-600 text-sm">yoursite.url</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {pageSettings.title || 'Cole — Minimal Portfolio Template'}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {pageSettings.description || 'A clean, modern portfolio template crafted for designers to showcase their work professionally.'}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

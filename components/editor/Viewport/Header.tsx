@@ -79,6 +79,8 @@ export const Header = () => {
     e.preventDefault();
     const params = new URLSearchParams(searchParams.toString());
     params.set('view', 'settings');
+    params.set('pageId', currentPageId);
+
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -198,7 +200,7 @@ export const Header = () => {
     }
   };
 
-  console.log('has un',hasUnsavedChanges)
+  console.log('current page id',currentPageId)
 
   
 
