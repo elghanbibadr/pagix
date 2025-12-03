@@ -41,7 +41,7 @@ const Btn = styled.a`
 `;
 
 // ✅ Helper function to determine border color based on element type and depth
-const getBorderConfig = (isRoot: boolean, displayName: string, depth: number) => {
+const getBorderConfig = (isRoot: boolean, displayName: string) => {
   // Root container (App) - Green border
   if (isRoot) {
     return {
