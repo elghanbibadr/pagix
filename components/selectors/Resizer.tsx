@@ -184,19 +184,7 @@ useEffect(() => {
 
   return (
     <Resizable
-      enable={[
-        'top',
-        'left',
-        'bottom',
-        'right',
-        'topLeft',
-        'topRight',
-        'bottomLeft',
-        'bottomRight',
-      ].reduce((acc: any, key) => {
-        acc[key] = active && inNodeContext;
-        return acc;
-      }, {})}
+      enable={false}
       className={cx([
         {
           'm-auto': isRootNode,

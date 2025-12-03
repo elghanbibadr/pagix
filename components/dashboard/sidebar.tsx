@@ -23,7 +23,7 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
 
   const navItems = [
     { href: '/dashboard', label: t('dashboard'), icon: Home },
-    { href: '/builder', label: t('createPage'), icon: Plus }
+    // { href: '/builder', label: t('createPage'), icon: Plus }
     // { href: '/settings', label: t('settings'), icon: Settings }
   ];
 

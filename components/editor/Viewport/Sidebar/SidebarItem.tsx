@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import { Plus } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
 import { styled } from 'styled-components';
@@ -33,6 +34,8 @@ export type SidebarItemProps = {
   onChange?: (bool: boolean) => void;
   children?: React.ReactNode;
   className?: string;
+  showAddButton?: boolean; // ✅ New prop to control Plus icon visibility
+  onAddClick?: () => void; // ✅ New prop for Plus icon click handler
 };
 
 const HeaderDiv = styled.div`
@@ -51,6 +54,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   height,
   onChange,
   className,
+  showAddButton = false, // ✅ Default false
+  onAddClick,
 }) => {
   return (
     <SidebarItemDiv
@@ -76,13 +81,26 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           />
           <h2 className="text-xs uppercase">{title}</h2>
         </div>
-        <Chevron $visible={visible}>
+        <Chevron className='flex items-center gap-2' $visible={visible}>
           <Image
             src="/icons/arrow.svg"
             alt="Arrow"
             width={10}
             height={10}
           />
+          {/* ✅ Show Plus icon only if showAddButton is true */}
+          {showAddButton && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ Prevent collapsing the section
+                if (onAddClick) onAddClick();
+              }}
+              className="hover:bg-gray-200 rounded p-1 transition"
+              title="Add new page"
+            >
+              <Plus height={13} width={13} />
+            </button>
+          )}
         </Chevron>
       </HeaderDiv>
       {visible ? (

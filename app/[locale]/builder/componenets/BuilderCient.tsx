@@ -32,7 +32,6 @@ interface BuilderClientProps {
   initialWebsite: any;
   initialPages: any[];
   websiteId: string;
-//   userId: string;
 }
 
 const EditorContent = ({ pageContent }: { pageContent: any }) => {
@@ -54,31 +53,70 @@ const EditorContent = ({ pageContent }: { pageContent: any }) => {
 };
 
 const EditorWrapper: React.FC = () => {
-  const { setPreviewMode, currentPage, currentPageId, isLoading,setHasUnsavedChanges } = usePages();
+  const { 
+    setPreviewMode, 
+    currentPage, 
+    currentPageId, 
+    isLoading, 
+    setHasUnsavedChanges 
+  } = usePages();
   const [isPreview, setIsPreview] = useState(false);
-  const searchParams=useSearchParams()
+  const searchParams = useSearchParams();
   const showSettings = searchParams.get('view') === 'settings';
+  
+  const previousStateRef = useRef<string>(''); // ✅ Store serialized state
+  const isInitializedRef = useRef(false);
+  const previousPageIdRef = useRef(currentPageId);
 
- const isInitialLoadRef = useRef(true); // ✅ Track if this is initial load
-
-  const handleNodesChange = () => {
-    // ✅ Skip the first call (initial load)
-    if (isInitialLoadRef.current) {
-      console.log('⏭️ Skipping initial nodes setup');
-      isInitialLoadRef.current = false;
+  const handleNodesChange = (query: any) => {
+    // ✅ Serialize current state
+    const currentSerialized = JSON.stringify(query.serialize());
+    
+    // ✅ Skip if not initialized yet
+    if (!isInitializedRef.current) {
+      console.log('⏭️ Skipping - not initialized yet');
+      previousStateRef.current = currentSerialized;
+      isInitializedRef.current = true;
       return;
     }
 
-    setHasUnsavedChanges(true)
-
-    console.log('✏️ Nodes changed by user');
-    // You can perform actions here, like marking as unsaved
+    // ✅ Compare with previous state
+    if (currentSerialized !== previousStateRef.current) {
+      console.log('✏️ Content changed - marking as unsaved');
+      setHasUnsavedChanges(true);
+      previousStateRef.current = currentSerialized;
+    } else {
+      console.log('⏭️ No content change detected');
+    }
   };
 
-  // ✅ Reset the flag when page changes
+  // ✅ Reset when page changes
   useEffect(() => {
-    isInitialLoadRef.current = true;
-  }, [currentPageId]);
+    if (previousPageIdRef.current !== currentPageId) {
+      console.log('🔄 Page switched, resetting state tracking');
+      
+      // Reset unsaved changes
+      setHasUnsavedChanges(false);
+      
+      // Mark as uninitialized so next change sets baseline
+      isInitializedRef.current = false;
+      previousPageIdRef.current = currentPageId;
+    }
+  }, [currentPageId, setHasUnsavedChanges]);
+
+  // ✅ Reset when returning from settings
+  useEffect(() => {
+    if (showSettings === false) {
+      // Mark as uninitialized to re-capture baseline
+      isInitializedRef.current = false;
+    }
+  }, [showSettings]);
+
+  // ✅ Reset on initial mount
+  useEffect(() => {
+    isInitializedRef.current = false;
+    console.log('🎬 Initial mount - will capture baseline on first change');
+  }, []);
 
   if (isLoading) {
     return (
@@ -101,61 +139,36 @@ const EditorWrapper: React.FC = () => {
     );
   }
 
-  const handlePreviewToggle = () => {
-    const newPreviewState = !isPreview;
-    setIsPreview(newPreviewState);
-    setPreviewMode(newPreviewState);
-  };
-
-  console.log('current page',currentPage)
-
   return (
     <div className="h-screen flex flex-col">
-      {/* Top Bar */}
-      <div className="bg-gray-800 text-white p-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Website Editor</h1>
-        <div className="flex gap-2">
-       
-          {/* {isPreview && (
-            <button
-              onClick={handlePreviewToggle}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded"
-            >
-              Exit Preview
-            </button>
-          )} */}
-        </div>
-      </div>
-
-      {/* Page Navigation */}
-
+      {/* Settings View */}
+      {showSettings && (
+        <SettingsView onClose={() => {}} />
+      )}
+      
       {/* Editor */}
-          {showSettings && (
-  <SettingsView onClose={()=>{}} />
-)}
-     {!showSettings && <div className="flex-1 overflow-hidden">
-        <Editor
-         onNodesChange={handleNodesChange}
-          resolver={{
-            Text,
-            Container,
-            Button,
-            CustomLink,
-          }}
-          enabled={!isPreview}
-          onRender={RenderNode}
-        >
-      {/* <PageNavigation /> */}
-
-          <Viewport>
-            <EditorContent key={currentPageId} pageContent={currentPage.content} />
-          </Viewport>
-        </Editor>
-      </div>}
+      {!showSettings && (
+        <div className="flex-1 overflow-hidden">
+          <Editor
+            onNodesChange={handleNodesChange} // ✅ Pass query object
+            resolver={{
+              Text,
+              Container,
+              Button,
+              CustomLink,
+            }}
+            enabled={!isPreview}
+            onRender={RenderNode}
+          >
+            <Viewport>
+              <EditorContent key={currentPageId} pageContent={currentPage.content} />
+            </Viewport>
+          </Editor>
+        </div>
+      )}
     </div>
   );
 };
-
 export default function BuilderClient({
   initialWebsite,
   initialPages,

@@ -22,9 +22,20 @@ export const Sidebar = () => {
   const [layersVisible, setLayerVisible] = useState(true);
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const [pagesVisible, setPagesVisible] = useState(true);
+  const [isAddingPage, setIsAddingPage] = useState(false); // ✅ Add state for adding page
+  
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
+
+  // ✅ Handle Plus icon click
+  const handleAddPageClick = () => {
+    setIsAddingPage(true);
+    // Make sure Pages section is visible
+    if (!pagesVisible) {
+      setPagesVisible(true);
+    }
+  };
 
   return (
     <SidebarDiv $enabled={enabled} className="sidebar transition bg-white w-2">
@@ -46,8 +57,13 @@ export const Sidebar = () => {
           height={!toolbarVisible && !layersVisible ? 'full' : '30%'}
           visible={pagesVisible}
           onChange={(val) => setPagesVisible(val)}
+          showAddButton={true} // ✅ Show Plus icon for Pages
+          onAddClick={handleAddPageClick} // ✅ Handle Plus click
         >
-          <PageNavigationPanel />
+          <PageNavigationPanel 
+            isAddingPage={isAddingPage} 
+            setIsAddingPage={setIsAddingPage} 
+          />
         </SidebarItem>
 
         <SidebarItem

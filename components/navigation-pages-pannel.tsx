@@ -1,24 +1,47 @@
 // components/editor/Sidebar/PageNavigationPanel.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePages } from '@/contexts/PageContext';
 import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { useEditor } from '@craftjs/core';
 
-export const PageNavigationPanel = () => {
+interface PageNavigationPanelProps {
+  isAddingPage: boolean;
+  setIsAddingPage: (value: boolean) => void;
+}
+
+export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({ 
+  isAddingPage, 
+  setIsAddingPage 
+}) => {
   const { 
     pages, 
     currentPageId, 
     switchPage, 
     addPage, 
     deletePage, 
-    renamePage 
+    renamePage ,
+    setHasUnsavedChanges,
+    updatePageContent
   } = usePages();
   
-  const [isAddingPage, setIsAddingPage] = useState(false);
   const [newPageName, setNewPageName] = useState('');
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
   const [editingPageName, setEditingPageName] = useState('');
+      const { actions, query } = useEditor();
+  
+
+  // ✅ Auto-focus input when isAddingPage becomes true
+  useEffect(() => {
+    if (isAddingPage) {
+      // Small delay to ensure input is rendered
+      setTimeout(() => {
+        const input = document.querySelector('input[placeholder="Page name..."]') as HTMLInputElement;
+        if (input) input.focus();
+      }, 50);
+    }
+  }, [isAddingPage]);
 
   const handleAddPage = () => {
     if (newPageName.trim()) {
@@ -52,19 +75,20 @@ export const PageNavigationPanel = () => {
     }
   };
 
+
+    const handleSwitching=(pageId:string) =>{
+      const editorStateJson = query.serialize();
+    console.log( 'editorStateJson',editorStateJson)
+    updatePageContent(currentPageId,editorStateJson)
+    switchPage(pageId)
+    setHasUnsavedChanges(false)
+  }
+
   return (
     <div className="p-3">
-      {/* Add Page Button */}
-      <div className="mb-3">
-        {!isAddingPage ? (
-          <button
-            onClick={() => setIsAddingPage(true)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-          >
-            <Plus size={16} />
-            Add Page
-          </button>
-        ) : (
+      {/* Add Page Input - Shown when Plus icon is clicked */}
+      {isAddingPage && (
+        <div className="mb-3">
           <div className="flex gap-2">
             <input
               type="text"
@@ -97,8 +121,8 @@ export const PageNavigationPanel = () => {
               <X size={16} />
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Pages List */}
       <div className="space-y-2">
@@ -144,7 +168,7 @@ export const PageNavigationPanel = () => {
               // View Mode
               <div className="flex items-center justify-between">
                 <div
-                  onClick={() => switchPage(page.id)}
+                  onClick={() => handleSwitching(page.id)}
                   className="flex-1 min-w-0"
                 >
                   <div className="flex items-center gap-2">

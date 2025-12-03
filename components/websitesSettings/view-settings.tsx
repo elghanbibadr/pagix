@@ -5,32 +5,44 @@ import React, { useState } from 'react';
 import { 
   Globe, 
   Link as LinkIcon, 
-//   Redirect, 
   FileText, 
-  Code, 
-  Image as ImageIcon, 
-  FileCode,
-  FileType,
-  Settings as SettingsIcon
+  Loader2,
+  ArrowLeft
 } from 'lucide-react';
 import { usePages } from '@/contexts/PageContext';
 import { updatePageMetaAction } from '@/app/actions/websitesActions';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 interface SettingsViewProps {
   onClose: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
-  const { currentPage, pages } = usePages();
+  const { currentPage, pages, setHasUnsavedChanges } = usePages();
   const [activeTab, setActiveTab] = useState('page-settings');
   const [selectedPage, setSelectedPage] = useState(currentPage?.id || '');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  // ✅ Add validation errors state
+  const [errors, setErrors] = useState({
+    title: '',
+    url: '',
+  });
 
   // Page settings state
   const [pageSettings, setPageSettings] = useState({
     title: currentPage?.name || '',
     url: currentPage?.slug || '',
     description: currentPage?.meta_description || '',
-  
   });
 
   // Update settings when selected page changes
@@ -41,29 +53,123 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
         title: page.name || '',
         url: page.slug || '',
         description: page.meta_description || ''
-  
       });
+      // Clear errors when switching pages
+      setErrors({ title: '', url: '' });
     }
   }, [selectedPage, pages]);
 
+  // ✅ Validate inputs
+  const validateInputs = () => {
+    const newErrors = {
+      title: '',
+      url: '',
+    };
+
+    // Validate title
+    if (!pageSettings.title.trim()) {
+      newErrors.title = 'Page name is required';
+    }
+
+    // Validate slug
+    if (!pageSettings.url.trim()) {
+      newErrors.url = 'URL slug is required';
+    } else if (!/^[a-z0-9-]+$/.test(pageSettings.url)) {
+      newErrors.url = 'URL slug can only contain lowercase letters, numbers, and hyphens';
+    }
+
+    setErrors(newErrors);
+
+    // Return true if no errors
+    return !newErrors.title && !newErrors.url;
+  };
+
   const handleSave = async () => {
-    console.log('Saving settings:', pageSettings);
-    // TODO: Implement save to database
-    await updatePageMetaAction(selectedPage,{name:pageSettings.title,slug:pageSettings.url, meta_description:pageSettings.description})
-    onClose();
+    if (!selectedPage) return;
+
+    // ✅ Validate before saving
+    if (!validateInputs()) {
+      toast.error('Please fix the validation errors');
+      return;
+    }
+
+    setIsUpdating(true);
+    
+    try {
+      console.log('Saving settings:', pageSettings);
+      
+      await updatePageMetaAction(selectedPage, {
+        name: pageSettings.title.trim(),
+        slug: pageSettings.url.trim(),
+        meta_description: pageSettings.description.trim()
+      });
+
+      toast.success("Page updated successfully!");
+
+      // Optional: close after a delay
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+
+    } catch (error) {
+      console.error('❌ Failed to save settings:', error);
+      
+      toast.error("Failed to update page settings. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const siteSettingsMenu = [
     { id: 'general', label: 'General', icon: Globe },
     { id: 'domains', label: 'Domains', icon: LinkIcon },
-
   ];
 
+  // ✅ Function to close settings by removing URL params
+  const closeSettings = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('view');
+    params.delete('pageId');
+    const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    router.replace(newUrl, { scroll: false });
+  };
+
+  const handleBackToEditor = () => {
+    setHasUnsavedChanges(false);
+    closeSettings();
+  };
+
+  // ✅ Auto-generate slug from title
+  const handleTitleChange = (value: string) => {
+    setPageSettings({ ...pageSettings, title: value });
+    
+    // Clear title error if value is not empty
+    if (value.trim()) {
+      setErrors(prev => ({ ...prev, title: '' }));
+    }
+  };
+
+  // ✅ Validate and format slug on change
+  const handleSlugChange = (value: string) => {
+    // Convert to lowercase and replace spaces with hyphens
+    const formattedSlug = value
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+    
+    setPageSettings({ ...pageSettings, url: formattedSlug });
+    
+    // Clear error if valid
+    if (formattedSlug.trim() && /^[a-z0-9-]+$/.test(formattedSlug)) {
+      setErrors(prev => ({ ...prev, url: '' }));
+    }
+  };
+
   return (
-    <div className="-0 bg-white bg-opacity-50 z-[100000] flex items-center justify-center">
-      <div className="bg-white w-full max-w-7xl h-[90vh] rounded-lg shadow-2xl flex overflow-hidden">
+    <div className="flex items-center justify-center">
+      <div className="bg-white w-full flex overflow-hidden">
         {/* Sidebar */}
-        <div className="w-64 bg-white text-white p-4 overflow-y-auto">
+        <div className="w-64 bg-white border-r p-4 overflow-y-auto">
           {/* Site Settings */}
           <div className="mb-6">
             <h3 className="text-xs font-semibold text-gray-400 uppercase mb-3 px-2">
@@ -74,14 +180,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
                 const Icon = item.icon;
                 return (
                   <li key={item.id}>
-                    <button
-                      onClick={() => setActiveTab(item.id)}
+                    <Button
+                      variant="ghost"
                       disabled={true}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded text-sm text-gray-500 cursor-not-allowed opacity-50"
+                      className="w-full justify-start gap-3 text-gray-500 cursor-not-allowed opacity-50"
                     >
                       <Icon size={16} />
                       {item.label}
-                    </button>
+                    </Button>
                   </li>
                 );
               })}
@@ -96,20 +202,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
             <ul className="space-y-1">
               {pages.map((page) => (
                 <li key={page.id}>
-                  <button
+                  <Button
+                    variant={activeTab === 'page-settings' && selectedPage === page.id ? "secondary" : "ghost"}
                     onClick={() => {
                       setActiveTab('page-settings');
                       setSelectedPage(page.id);
                     }}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded text-sm transition ${
-                      activeTab === 'page-settings' && selectedPage === page.id
-                        ? 'bg-gray-800 text-white'
-                        : 'text-gray-300 hover:bg-gray-800'
-                    }`}
+                    className="w-full justify-start gap-3"
                   >
                     <FileText size={16} />
                     <span className="truncate">{page.name}</span>
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -117,16 +220,34 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col bg-gray-50">
+        <div className="w-full">
           {/* Header */}
           <div className="bg-white border-b px-8 py-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">Page Settings</h2>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm font-medium"
-            >
-              Save
-            </button>
+            <div className='flex gap-x-3'>
+              <Button
+                onClick={handleSave}
+                disabled={isUpdating}
+                className="min-w-[100px]"
+              >
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save'
+                )}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleBackToEditor}
+                disabled={isUpdating}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Editor
+              </Button>
+            </div>
           </div>
 
           {/* Content Area */}
@@ -135,61 +256,59 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
               {/* Title */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title
+                  Title <span className="text-red-500">*</span>
                 </label>
-                <input
+                <Input
                   type="text"
                   value={pageSettings.title}
-                  onChange={(e) => setPageSettings({ ...pageSettings, title: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(e) => handleTitleChange(e.target.value)}
                   placeholder="Cole — Minimal Portfolio Template"
+                  disabled={isUpdating}
+                  className={errors.title ? 'border-red-500' : ''}
                 />
+                {errors.title && (
+                  <p className="mt-1 text-sm text-red-500">{errors.title}</p>
+                )}
               </div>
 
               {/* URL */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL
+                  URL Slug <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center gap-2">
-                  {/* <span className="text-gray-500 text-sm">/</span> */}
-                  <input
-                    type="text"
-                    value={pageSettings.url}
-                    onChange={(e) => setPageSettings({ ...pageSettings, url: e.target.value })}
-                    className="flex-1 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="test"
-                  />
-                </div>
+                <Input
+                  type="text"
+                  value={pageSettings.url}
+                  onChange={(e) => handleSlugChange(e.target.value)}
+                  placeholder="home"
+                  disabled={isUpdating}
+                  className={errors.url ? 'border-red-500' : ''}
+                />
+                {errors.url ? (
+                  <p className="mt-1 text-sm text-red-500">{errors.url}</p>
+                ) : (
+                  <p className="mt-1 text-xs text-gray-500">
+                    yoursite.com/{pageSettings.url || 'slug'}
+                  </p>
+                )}
               </div>
 
               {/* Page Description */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Page Description
+                  Page Description (SEO)
                 </label>
-                <textarea
+                <Textarea
                   value={pageSettings.description}
                   onChange={(e) => setPageSettings({ ...pageSettings, description: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="A clean, modern portfolio template crafted for designers to showcase their work professionally."
+                  placeholder="page description"
+                  disabled={isUpdating}
                 />
               </div>
-
             </div>
           </div>
         </div>
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
       </div>
     </div>
   );

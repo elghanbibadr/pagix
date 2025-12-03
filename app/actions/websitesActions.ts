@@ -388,3 +388,47 @@ export const updatePageMetaAction = async (
     throw error;
   }
 };
+
+
+// app/actions/websitesActions.ts
+
+// Delete website and all its pages
+export const deleteWebsiteAction = async (websiteId: string) => {
+  const supabase = await createClient();
+
+  try {
+    console.log('🗑️ Deleting website:', websiteId);
+
+    // Step 1: Delete all pages associated with this website
+    const { error: pagesError } = await supabase
+      .from('pages')
+      .delete()
+      .eq('website_id', websiteId);
+
+    if (pagesError) {
+      console.error('❌ Error deleting pages:', pagesError);
+      throw pagesError;
+    }
+
+    console.log('✅ All pages deleted for website:', websiteId);
+
+    // Step 2: Delete the website itself
+    const { error: websiteError } = await supabase
+      .from('websites')
+      .delete()
+      .eq('id', websiteId);
+
+    if (websiteError) {
+      console.error('❌ Error deleting website:', websiteError);
+      throw websiteError;
+    }
+
+    console.log('✅ Website deleted successfully:', websiteId);
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Error deleting website:', error);
+    throw error;
+  }
+};

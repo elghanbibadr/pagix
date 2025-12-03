@@ -6,7 +6,7 @@ import { usePages } from '@/contexts/PageContext';
 import { useEditor } from '@craftjs/core';
 
 export const PageNavigation: React.FC = () => {
-  const { pages, currentPageId, addPage, deletePage, renamePage, switchPage,updatePageContent} = usePages();
+  const { pages, currentPageId, addPage, deletePage, renamePage, switchPage,updatePageContent,setHasUnsavedChanges,hasUnsavedChanges} = usePages();
     const { actions, query } = useEditor();
 
     console.log('current page id',currentPageId)
@@ -38,19 +38,24 @@ export const PageNavigation: React.FC = () => {
   };
 
     const handleSave = () => {
+      alert('save')
     const editorStateJson = query.serialize();
     console.log( 'editorStateJson',editorStateJson)
     updatePageContent(currentPageId,editorStateJson)
+        // setHasUnsavedChanges(false)
+        console.log('unsaved',hasUnsavedChanges)
+
     // You can now send this to a server, save it to local storage, etc.
   };
 
   const handleSwitching=(pageId:string) =>{
     handleSave();
     switchPage(pageId)
+    setHasUnsavedChanges(false)
   }
 
   return (
-    <div className="bg-gray-100 border-b border-gray-300 px-4 py-2 flex items-center gap-2 overflow-x-auto">
+    <div className="bg-black border-b border-gray-300 px-4 py-2 flex items-center gap-2 overflow-x-auto">
       {/* Page Tabs */}
       {pages.map((page) => (
         <div

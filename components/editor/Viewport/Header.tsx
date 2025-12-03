@@ -65,7 +65,7 @@ const Item = styled.a<{ disabled?: boolean }>`
 
 export const Header = () => {
   const { query, actions } = useEditor();
-  const { saveAllChanges, hasUnsavedChanges, isSaving, currentPageId,pendingChanges } = usePages();
+  const { saveAllChanges, hasUnsavedChanges, isSaving, currentPageId,pendingChanges,setHasUnsavedChanges } = usePages();
   const [showExitDialog, setShowExitDialog] = useState(false);
     const router = useRouter();
   const searchParams = useSearchParams();
@@ -84,7 +84,7 @@ export const Header = () => {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  
+  console.log('has unsaved',hasUnsavedChanges)
   const handleSave = async () => {
     try {
       console.log('💾 Save button clicked');
@@ -103,6 +103,8 @@ export const Header = () => {
         pageId: currentPageId,
         content: json
       });
+
+      setHasUnsavedChanges(false)
       
       console.log('✅ Changes saved successfully');
     } catch (error) {
@@ -203,6 +205,7 @@ export const Header = () => {
   console.log('current page id',currentPageId)
 
   
+  
 
   return (
     <>
@@ -281,7 +284,7 @@ export const Header = () => {
             )}
             
             {/* Finish Editing / Edit Button */}
-            <Btn
+            {/* <Btn
               className={cx([
                 'transition cursor-pointer',
                 {
@@ -313,13 +316,13 @@ export const Header = () => {
                 </>
               )}
             </Btn>
-            
+             */}
             <Btn onClick={handlePreview} className='bg-black cursor-pointer text-white'>
               Preview
             </Btn>
             
             {/* Back to Dashboard Button */}
-            <Button onClick={handleBackToDashboard} variant="outline">
+            <Button className='text-black' onClick={handleBackToDashboard} variant="outline">
               Back to Dashboard
             </Button>
           </div>
