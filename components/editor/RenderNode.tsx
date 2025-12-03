@@ -1,18 +1,24 @@
+// components/editor/RenderNode.tsx
 import { useNode, useEditor } from '@craftjs/core';
 import { ROOT_NODE } from '@craftjs/utils';
-import Image from 'next/image';
-import * as React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { styled } from 'styled-components';
+import styled from 'styled-components';
+
+import { ArrowUp, Move, Trash2 } from 'lucide-react';
 
 const IndicatorDiv = styled.div`
   height: 30px;
   margin-top: -29px;
   font-size: 12px;
   line-height: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
 
-  img {
-    filter: brightness(0) invert(1);
+  svg {
+    fill: #fff;
     width: 15px;
     height: 15px;
   }
@@ -23,6 +29,7 @@ const Btn = styled.a`
   opacity: 0.9;
   display: flex;
   align-items: center;
+  cursor: pointer;
   > div {
     position: relative;
     top: -50%;
@@ -30,7 +37,35 @@ const Btn = styled.a`
   }
 `;
 
-export const RenderNode = ({ render }) => {
+// ✅ Helper function to determine border color based on element type and depth
+const getBorderConfig = (isRoot: boolean, displayName: string, depth: number) => {
+  // Root container (App) - Green border
+  if (isRoot) {
+    return {
+      color: '#22c55e', // green-500
+      width: '3px',
+      style: 'solid'
+    };
+  }
+  
+  // Container elements - Orange border
+  if (displayName === 'Container') {
+    return {
+      color: '#f97316', // orange-500
+      width: '2px',
+      style: 'solid'
+    };
+  }
+  
+  // All other elements (Text, Button, etc.) - Blue border
+  return {
+    color: '#3b82f6', // blue-500
+    width: '2px',
+    style: 'solid'
+  };
+};
+
+export const RenderNode = ({ render }: any) => {
   const { id } = useNode();
   const { actions, query, isActive } = useEditor((_, query) => ({
     isActive: query.getEvent('selected').contains(id),
@@ -54,16 +89,20 @@ export const RenderNode = ({ render }) => {
     props: node.data.props,
   }));
 
-  const currentRef = React.useRef<HTMLDivElement | null>(null);
+  const currentRef = useRef<HTMLDivElement>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (dom) {
-      if (isActive || isHover) dom.classList.add('component-selected');
-      else dom.classList.remove('component-selected');
+      if (isActive || isHover) {
+        const borderConfig = getBorderConfig(id === ROOT_NODE, name, 0);
+        dom.style.border = `${borderConfig.width} ${borderConfig.style} ${borderConfig.color}`;
+      } else {
+        dom.style.border = '';
+      }
     }
-  }, [dom, isActive, isHover]);
+  }, [isActive, isHover, dom, id, name]);
 
-  const getPos = React.useCallback((dom: HTMLElement) => {
+  const getPos = useCallback((dom: HTMLElement) => {
     const { top, left, bottom } = dom
       ? dom.getBoundingClientRect()
       : { top: 0, left: 0, bottom: 0 };
@@ -73,94 +112,79 @@ export const RenderNode = ({ render }) => {
     };
   }, []);
 
-  const scroll = React.useCallback(() => {
+  const scroll = useCallback(() => {
     const { current: currentDOM } = currentRef;
 
-    if (!currentDOM) {
-      return;
-    }
-
-    const { top, left } = getPos(dom);
+    if (!currentDOM) return;
+    const { top, left } = getPos(dom as HTMLElement);
     currentDOM.style.top = top;
     currentDOM.style.left = left;
   }, [dom, getPos]);
 
-  React.useEffect(() => {
-    document
-      .querySelector('.craftjs-renderer')
-      .addEventListener('scroll', scroll);
+  useEffect(() => {
+    const renderer = document.querySelector('.craftjs-renderer');
+    if (renderer) {
+      renderer.addEventListener('scroll', scroll);
+    }
 
     return () => {
-      document
-        .querySelector('.craftjs-renderer')
-        ?.removeEventListener('scroll', scroll);
+      if (renderer) {
+        renderer.removeEventListener('scroll', scroll);
+      }
     };
   }, [scroll]);
 
+  const borderConfig = getBorderConfig(id === ROOT_NODE, name, 0);
+
   return (
     <>
-      {isHover || isActive
-        ? ReactDOM.createPortal(
-            <IndicatorDiv
-              ref={currentRef}
-              className="px-2 py-2 text-white bg-primary fixed flex items-center"
-              style={{
-                left: getPos(dom).left,
-                top: getPos(dom).top,
-                zIndex: 9999,
-              }}
-            >
-              <h2 className="flex-1 mr-4">{name}</h2>
-              {moveable ? (
-                <Btn
-                  className="mr-2 cursor-move"
-                  ref={(dom) => {
-                    drag(dom);
-                  }}
-                >
-                  <Image
-                    src="/icons/move.svg"
-                    alt="Move"
-                    width={15}
-                    height={15}
-                  />
-                </Btn>
-              ) : null}
-              {id !== ROOT_NODE && (
-                <Btn
-                  className="mr-2 cursor-pointer"
-                  onClick={() => {
-                    actions.selectNode(parent);
-                  }}
-                >
-                  <Image
-                    src="/icons/arrow-up.svg"
-                    alt="Arrow Up"
-                    width={15}
-                    height={15}
-                  />
-                </Btn>
-              )}
-              {deletable ? (
-                <Btn
-                  className="cursor-pointer"
-                  onMouseDown={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    actions.delete(id);
-                  }}
-                >
-                  <Image
-                    src="/icons/delete.svg"
-                    alt="Delete"
-                    width={15}
-                    height={15}
-                  />
-                </Btn>
-              ) : null}
-            </IndicatorDiv>,
-            document.querySelector('.page-container')
-          )
-        : null}
+      {(isHover || isActive) &&
+        ReactDOM.createPortal(
+          <IndicatorDiv
+            ref={currentRef as any}
+            className="fixed flex items-center px-2 text-white text-xs"
+            style={{
+              left: getPos(dom as HTMLElement).left,
+              top: getPos(dom as HTMLElement).top,
+              zIndex: 9999,
+              backgroundColor: borderConfig.color,
+            }}
+          >
+            <span className="flex-1">{name}</span>
+            {moveable ? (
+              <Btn
+                className="cursor-move mr-2"
+                ref={drag as any}
+                onMouseDown={(e: React.MouseEvent) => e.stopPropagation()}
+              >
+                <Move className="w-4 h-4" />
+              </Btn>
+            ) : null}
+            {id !== ROOT_NODE && (
+              <Btn
+                className="cursor-pointer mr-2"
+                onMouseDown={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  actions.selectNode(parent as string);
+                }}
+              >
+                <ArrowUp className="w-4 h-4" />
+              </Btn>
+            )}
+            {deletable ? (
+              <Btn
+                className="cursor-pointer"
+                onMouseDown={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  actions.delete(id);
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Btn>
+            ) : null}
+          </IndicatorDiv>,
+          document.querySelector('.page-container') as Element
+        )}
       {render}
     </>
   );
