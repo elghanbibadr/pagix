@@ -41,11 +41,11 @@ export async function createWebsite(data: {
   name: string;
   description: string;
 }) {
-
-    console.log("data",data)
+  console.log("data", data);
+  
   try {
-    const supabase =await  createClient();
-const user=await getUser()
+    const supabase = await createClient();
+    const user = await getUser();
      
     // Generate domain from project name
     const domain = data.name
@@ -61,6 +61,13 @@ const user=await getUser()
       .eq('domain', domain)
       .single();
 
+    // ✅ If domain exists, return error before attempting insert
+    if (existingWebsite) {
+      return {
+        success: false,
+        error: `A website with the name "${data.name}" already exists. Please choose a different name.`,
+      };
+    }
    
     const { data: website, error } = await supabase
       .from('websites')
@@ -73,10 +80,19 @@ const user=await getUser()
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // ✅ Check if it's a duplicate key error
+      if (error.code === '23505') {
+        return {
+          success: false,
+          error: `A website with similar name already exists. Please choose a different name.`,
+        };
+      }
+      throw error;
+    }
 
     // Create default home page
-    await supabase.from('pages').insert({
+    const { error: pageError } = await supabase.from('pages').insert({
       website_id: website.id,
       name: 'Home',
       slug: 'home',
@@ -85,6 +101,7 @@ const user=await getUser()
       order_index: 0,
     });
 
+    if (pageError) throw pageError;
 
     return {
       success: true,
@@ -92,9 +109,19 @@ const user=await getUser()
     };
   } catch (error: any) {
     console.error('Error creating website:', error);
+    
+    // ✅ Handle specific PostgreSQL error codes
+    if (error.code === '23505') {
+      // Duplicate key violation
+      return {
+        success: false,
+        error: 'A website with this name already exists. Please choose a different name.',
+      };
+    }
+    
     return {
       success: false,
-      error: error.message || 'Failed to create website',
+      error: error.message || 'Failed to create website. Please try again.',
     };
   }
 }

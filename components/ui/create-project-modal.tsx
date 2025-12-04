@@ -41,18 +41,23 @@ export function CreateProjectModal() {
         description: projectDescription 
       })
       
-      console.log('website', website)
+      if(website.success){
+
+        toast.success("Project created successfully!")
+        
+        // ✅ Navigate to builder (this triggers immediately)
+        router.push(`/builder?websiteId=${website.data.id}`)
+        
+        // ✅ Reset form and close modal (happens while navigating)
+        // The user won't see this because navigation is happening
+        setProjectName("")
+        setProjectDescription("")
+        setIsModalOpen(false)
+      }else{
+        toast.error(website.error)
+
+      }
       
-      toast.success("Project created successfully!")
-      
-      // ✅ Navigate to builder (this triggers immediately)
-      router.push(`/builder?websiteId=${website.data.id}`)
-      
-      // ✅ Reset form and close modal (happens while navigating)
-      // The user won't see this because navigation is happening
-      setProjectName("")
-      setProjectDescription("")
-      setIsModalOpen(false)
       
     } catch (error) {
       console.error('❌ Failed to create project:', error)

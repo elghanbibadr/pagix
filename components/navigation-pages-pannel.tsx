@@ -187,8 +187,8 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
                 </div>
 
                 {/* Action Buttons */}
-                {/* <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleStartEdit(page.id, page.name);
@@ -197,7 +197,7 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
                     title="Rename"
                   >
                     <Edit2 size={14} />
-                  </button>
+                  </button> */}
                   {pages.length > 1 && (
                     <button
                       onClick={(e) => {
@@ -210,7 +210,7 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
                       <Trash2 size={14} />
                     </button>
                   )}
-                </div> */}
+                </div>
               </div>
             )}
           </div>
