@@ -77,6 +77,7 @@ export const Header = () => {
   }));
    const openSettings = (e: React.MouseEvent) => {
     e.preventDefault();
+    handleSave()
     const params = new URLSearchParams(searchParams.toString());
     params.set('view', 'settings');
     params.set('pageId', currentPageId);
