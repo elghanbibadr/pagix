@@ -94,17 +94,21 @@ export const RenderNode = ({ render }: any) => {
 
   const currentRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (dom) {
-      if (isActive || isHover) {
-        const borderConfig = getBorderConfig(id === ROOT_NODE, name, 0);
-        dom.style.border = `${borderConfig.width} ${borderConfig.style} ${borderConfig.color}`;
-      } else {
-        dom.style.border = '';
-      }
+useEffect(() => {
+  if (dom) {
+    if (isActive || isHover) {
+      const borderConfig = getBorderConfig(id === ROOT_NODE, name, 0);
+      // ✅ Use outline instead of border
+      dom.style.outline = `${borderConfig.width} ${borderConfig.style} ${borderConfig.color}`;
+      dom.style.outlineOffset = '-1px'; // ✅ Draw outline inside the element
+      dom.style.border = ''; // ✅ Clear any existing border
+    } else {
+      dom.style.outline = '';
+      dom.style.outlineOffset = '';
+      dom.style.border = '';
     }
-  }, [isActive, isHover, dom, id, name]);
-
+  }
+}, [isActive, isHover, dom, id, name]);
   const getPos = useCallback((dom: HTMLElement) => {
     const { top, left, bottom } = dom
       ? dom.getBoundingClientRect()
