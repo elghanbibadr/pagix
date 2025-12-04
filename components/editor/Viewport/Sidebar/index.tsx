@@ -74,7 +74,7 @@ export const Sidebar = () => {
           onChange={(val) => setLayerVisible(val)}
         >
           <div className="">
-            <Layers expandRootOnLoad={true} />
+            <Layers  />
           </div>
         </SidebarItem>
       </div>

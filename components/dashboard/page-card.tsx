@@ -76,7 +76,8 @@ export default function PageCard({ title, date, status, website_id }: PageCardPr
 
         {/* Info */}
         <div className="p-4">
-          <p className="text-sm text-muted-foreground mb-3">Updated at {date}</p>
+          <h3 className="font-medium my-3">{title}</h3>
+          <p className="text-sm text-muted-foreground mb-3">Updated: {date}</p>
 
           <div className="flex items-center justify-between">
             <span

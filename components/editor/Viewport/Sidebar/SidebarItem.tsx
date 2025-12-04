@@ -64,9 +64,9 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
       className={classNames('flex flex-col', className)}
     >
       <HeaderDiv
-        onClick={() => {
-          if (onChange) onChange(!visible);
-        }}
+        // onClick={() => {
+        //   if (onChange) onChange(!visible);
+        // }}
         className={`cursor-pointer bg-white border-b last:border-b-0 flex items-center px-2 ${
           visible ? 'shadow-sm' : ''
         }`}
