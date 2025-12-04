@@ -43,11 +43,10 @@ const EditorContent = ({ pageContent }: { pageContent: any }) => {
         width="100%"
         height="auto"
         background={{ r: 255, g: 255, b: 255, a: 1 }}
-        padding={['40', '40', '40', '40']}
+        padding={['10', '40', '40', '40']}
         custom={{ displayName: 'App' }}
-      >
-        {/* Content will be loaded from pageContent */}
-      </Element>
+     />
+      {/* </Element> */}
     </Frame>
   );
 };

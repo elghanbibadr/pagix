@@ -56,7 +56,10 @@ export const Container = (props: Partial<ContainerProps>) => {
     shadow,
     radius,
     children,
+    width,
+    height,
   } = props;
+  
   return (
     <Resizer
       propKey={{ width: 'width', height: 'height' }}
@@ -74,6 +77,11 @@ export const Container = (props: Partial<ContainerProps>) => {
             : `0px 3px 100px ${shadow}px rgba(0, 0, 0, 0.13)`,
         borderRadius: `${radius}px`,
         flex: fillSpace === 'yes' ? 1 : 'unset',
+        width: width,
+        height: height,
+        maxWidth: '100%', 
+        boxSizing: 'border-box',
+        overflow: 'hidden', 
       }}
     >
       {children}
