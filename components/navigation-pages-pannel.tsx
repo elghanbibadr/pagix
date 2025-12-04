@@ -64,6 +64,7 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
     if(isExists){
       toast.error('page with similar name exists !')
       setNewPageName('')
+      setIsAddingPage(false)
       return
     }
     console.log("current pages",pages)

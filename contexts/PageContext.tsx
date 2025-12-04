@@ -27,6 +27,7 @@ interface Website {
   user_id: string;
   name: string;
   subdomain: string;
+  description:string;
   is_published: boolean;
   preview_published: boolean;
   production_published: boolean;
@@ -43,6 +44,7 @@ interface PageChange {
 interface PageContextType {
   website: Website | null;
   pages: Page[];
+  setPages:any ;
   currentPageId: string;
   currentPage: Page | undefined;
   isPreviewMode: boolean;
@@ -521,6 +523,7 @@ const updatePageContent = useCallback((id: string, content: any) => {
         isLoading,
         isSaving,
         hasUnsavedChanges,
+        setPages,
         addPage,
         deletePage,
         renamePage,

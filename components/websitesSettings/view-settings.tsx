@@ -10,12 +10,11 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { usePages } from '@/contexts/PageContext';
-import { updatePageMetaAction } from '@/app/actions/websitesActions';
+import { updatePageMetaAction, updateWebsiteAction } from '@/app/actions/websitesActions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -24,15 +23,26 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
-  const { currentPage, pages, setHasUnsavedChanges } = usePages();
-  const [activeTab, setActiveTab] = useState('page-settings');
+  const { currentPage, pages, setHasUnsavedChanges, website ,setPages} = usePages();
+  const [activeTab, setActiveTab] = useState('general'); // ✅ Start with general
   const [selectedPage, setSelectedPage] = useState(currentPage?.id || '');
   const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  // ✅ Add validation errors state
+  // ✅ Website settings state
+  const [websiteSettings, setWebsiteSettings] = useState({
+    name: website?.name || '',
+    description: website?.description || '',
+  });
+
+  // ✅ Website validation errors
+  const [websiteErrors, setWebsiteErrors] = useState({
+    name: '',
+  });
+
+  // Page validation errors
   const [errors, setErrors] = useState({
     title: '',
     url: '',
@@ -45,7 +55,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     description: currentPage?.meta_description || '',
   });
 
-  // Update settings when selected page changes
+  // Update page settings when selected page changes
   React.useEffect(() => {
     const page = pages.find(p => p.id === selectedPage);
     if (page) {
@@ -54,24 +64,33 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
         url: page.slug || '',
         description: page.meta_description || ''
       });
-      // Clear errors when switching pages
       setErrors({ title: '', url: '' });
     }
   }, [selectedPage, pages]);
 
-  // ✅ Validate inputs
-  const validateInputs = () => {
+  // ✅ Validate website inputs
+  const validateWebsiteInputs = () => {
+    const newErrors = { name: '' };
+
+    if (!websiteSettings.name.trim()) {
+      newErrors.name = 'Website name is required';
+    }
+
+    setWebsiteErrors(newErrors);
+    return !newErrors.name;
+  };
+
+  // ✅ Validate page inputs
+  const validatePageInputs = () => {
     const newErrors = {
       title: '',
       url: '',
     };
 
-    // Validate title
     if (!pageSettings.title.trim()) {
       newErrors.title = 'Page name is required';
     }
 
-    // Validate slug
     if (!pageSettings.url.trim()) {
       newErrors.url = 'URL slug is required';
     } else if (!/^[a-z0-9-]+$/.test(pageSettings.url)) {
@@ -79,16 +98,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     }
 
     setErrors(newErrors);
-
-    // Return true if no errors
     return !newErrors.title && !newErrors.url;
   };
 
-  const handleSave = async () => {
-    if (!selectedPage) return;
-
-    // ✅ Validate before saving
-    if (!validateInputs()) {
+  // ✅ Handle website settings save
+  const handleSaveWebsite = async () => {
+    if (!validateWebsiteInputs()) {
       toast.error('Please fix the validation errors');
       return;
     }
@@ -96,27 +111,84 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     setIsUpdating(true);
     
     try {
-      console.log('Saving settings:', pageSettings);
+      console.log('Saving website settings:', websiteSettings);
       
-      await updatePageMetaAction(selectedPage, {
-        name: pageSettings.title.trim(),
-        slug: pageSettings.url.trim(),
-        meta_description: pageSettings.description.trim()
+      await updateWebsiteAction(website.id, {
+        name: websiteSettings.name.trim(),
+        description: websiteSettings.description.trim()
       });
 
-      toast.success("Page updated successfully!");
+      toast.success("Website settings updated successfully!");
 
-      // Optional: close after a delay
       setTimeout(() => {
         onClose();
       }, 1000);
 
     } catch (error) {
-      console.error('❌ Failed to save settings:', error);
-      
-      toast.error("Failed to update page settings. Please try again.");
+      console.error('❌ Failed to save website settings:', error);
+      toast.error("Failed to update website settings. Please try again.");
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+
+
+// ✅ Handle page settings save
+const handleSavePage = async () => {
+  if (!selectedPage) return;
+
+  if (!validatePageInputs()) {
+    toast.error('Please fix the validation errors');
+    return;
+  }
+
+  setIsUpdating(true);
+  
+  try {
+    console.log('Saving page settings:', pageSettings);
+    
+    const updatedPage = await updatePageMetaAction(selectedPage, {
+      name: pageSettings.title.trim(),
+      slug: pageSettings.url.trim(),
+      meta_description: pageSettings.description.trim()
+    });
+
+    // ✅ Update local state with the new page data
+    setPages(prev => 
+      prev.map(p => 
+        p.id === selectedPage 
+          ? { 
+              ...p, 
+              name: pageSettings.title.trim(),
+              slug: pageSettings.url.trim(),
+              meta_description: pageSettings.description.trim(),
+              updated_at: new Date().toISOString()
+            } 
+          : p
+      )
+    );
+
+    toast.success("Page settings updated successfully!");
+
+    setTimeout(() => {
+      onClose();
+    }, 1000);
+
+  } catch (error) {
+    console.error('❌ Failed to save page settings:', error);
+    toast.error("Failed to update page settings. Please try again.");
+  } finally {
+    setIsUpdating(false);
+  }
+};
+
+  // ✅ Determine which save handler to use
+  const handleSave = () => {
+    if (activeTab === 'general') {
+      handleSaveWebsite();
+    } else if (activeTab === 'page-settings') {
+      handleSavePage();
     }
   };
 
@@ -125,7 +197,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     { id: 'domains', label: 'Domains', icon: LinkIcon },
   ];
 
-  // ✅ Function to close settings by removing URL params
   const closeSettings = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('view');
@@ -139,19 +210,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     closeSettings();
   };
 
-  // ✅ Auto-generate slug from title
+  const handleWebsiteNameChange = (value: string) => {
+    setWebsiteSettings({ ...websiteSettings, name: value });
+    if (value.trim()) {
+      setWebsiteErrors(prev => ({ ...prev, name: '' }));
+    }
+  };
+
   const handleTitleChange = (value: string) => {
     setPageSettings({ ...pageSettings, title: value });
-    
-    // Clear title error if value is not empty
     if (value.trim()) {
       setErrors(prev => ({ ...prev, title: '' }));
     }
   };
 
-  // ✅ Validate and format slug on change
   const handleSlugChange = (value: string) => {
-    // Convert to lowercase and replace spaces with hyphens
     const formattedSlug = value
       .toLowerCase()
       .replace(/\s+/g, '-')
@@ -159,10 +232,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
     
     setPageSettings({ ...pageSettings, url: formattedSlug });
     
-    // Clear error if valid
     if (formattedSlug.trim() && /^[a-z0-9-]+$/.test(formattedSlug)) {
       setErrors(prev => ({ ...prev, url: '' }));
     }
+  };
+
+  // ✅ Determine the header title based on active tab
+  const getHeaderTitle = () => {
+    if (activeTab === 'general') return 'Website Settings';
+    if (activeTab === 'domains') return 'Domain Settings';
+    return 'Page Settings';
   };
 
   return (
@@ -178,12 +257,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
             <ul className="space-y-1">
               {siteSettingsMenu.map((item) => {
                 const Icon = item.icon;
+                const isDisabled = item.id === 'domains'; // ✅ Only domains is disabled
                 return (
                   <li key={item.id}>
                     <Button
-                      variant="ghost"
-                      disabled={true}
-                      className="w-full justify-start gap-3 text-gray-500 cursor-not-allowed opacity-50"
+                      variant={activeTab === item.id ? "secondary" : "ghost"}
+                      disabled={isDisabled}
+                      onClick={() => !isDisabled && setActiveTab(item.id)}
+                      className={`w-full justify-start gap-3 ${
+                        isDisabled ? 'text-gray-500 cursor-not-allowed opacity-50' : ''
+                      }`}
                     >
                       <Icon size={16} />
                       {item.label}
@@ -223,7 +306,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
         <div className="w-full">
           {/* Header */}
           <div className="bg-white border-b px-8 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Page Settings</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {getHeaderTitle()} {/* ✅ Dynamic header */}
+            </h2>
             <div className='flex gap-x-3'>
               <Button
                 onClick={handleSave}
@@ -253,59 +338,111 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onClose }) => {
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto p-8">
             <div className="max-w-3xl">
-              {/* Title */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  value={pageSettings.title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Cole — Minimal Portfolio Template"
-                  disabled={isUpdating}
-                  className={errors.title ? 'border-red-500' : ''}
-                />
-                {errors.title && (
-                  <p className="mt-1 text-sm text-red-500">{errors.title}</p>
-                )}
-              </div>
+              {/* ✅ General Tab Content (Website Settings) */}
+              {activeTab === 'general' && (
+                <>
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Website Information</h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Update your website's basic information
+                    </p>
+                  </div>
 
-              {/* URL */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL Slug <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  value={pageSettings.url}
-                  onChange={(e) => handleSlugChange(e.target.value)}
-                  placeholder="home"
-                  disabled={isUpdating}
-                  className={errors.url ? 'border-red-500' : ''}
-                />
-                {errors.url ? (
-                  <p className="mt-1 text-sm text-red-500">{errors.url}</p>
-                ) : (
-                  <p className="mt-1 text-xs text-gray-500">
-                    yoursite.com/{pageSettings.url || 'slug'}
-                  </p>
-                )}
-              </div>
+                  {/* Website Name */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Website Name <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={websiteSettings.name}
+                      onChange={(e) => handleWebsiteNameChange(e.target.value)}
+                      placeholder="My Awesome Website"
+                      disabled={isUpdating}
+                      className={websiteErrors.name ? 'border-red-500' : ''}
+                    />
+                    {websiteErrors.name && (
+                      <p className="mt-1 text-sm text-red-500">{websiteErrors.name}</p>
+                    )}
+                  </div>
 
-              {/* Page Description */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Page Description (SEO)
-                </label>
-                <Textarea
-                  value={pageSettings.description}
-                  onChange={(e) => setPageSettings({ ...pageSettings, description: e.target.value })}
-                  rows={4}
-                  placeholder="page description"
-                  disabled={isUpdating}
-                />
-              </div>
+                  {/* Website Description */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Website Description
+                    </label>
+                    <Textarea
+                      value={websiteSettings.description}
+                      onChange={(e) => setWebsiteSettings({ ...websiteSettings, description: e.target.value })}
+                      rows={4}
+                      placeholder="Describe your website..."
+                      disabled={isUpdating}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      This description is for your reference only
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* ✅ Page Settings Tab Content */}
+              {activeTab === 'page-settings' && (
+                <>
+                  {/* Title */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Title <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={pageSettings.title}
+                      onChange={(e) => handleTitleChange(e.target.value)}
+                      placeholder="Page Title"
+                      disabled={isUpdating}
+                      className={errors.title ? 'border-red-500' : ''}
+                    />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-500">{errors.title}</p>
+                    )}
+                  </div>
+
+                  {/* URL */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      URL Slug <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="text"
+                      value={pageSettings.url}
+                      onChange={(e) => handleSlugChange(e.target.value)}
+                      placeholder="home"
+                      disabled={isUpdating}
+                      className={errors.url ? 'border-red-500' : ''}
+                    />
+                    {errors.url ? (
+                      <p className="mt-1 text-sm text-red-500">{errors.url}</p>
+                    ) : (
+                      <p className="mt-1 text-xs text-gray-500">
+                        yoursite.com/{pageSettings.url || 'slug'}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Page Description */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Page Description (SEO)
+                    </label>
+                    <Textarea
+                      value={pageSettings.description}
+                      onChange={(e) => setPageSettings({ ...pageSettings, description: e.target.value })}
+                      rows={4}
+                      placeholder="page description"
+                      disabled={isUpdating}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

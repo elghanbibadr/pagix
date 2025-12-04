@@ -459,3 +459,48 @@ export const deleteWebsiteAction = async (websiteId: string) => {
     throw error;
   }
 };
+
+
+
+
+
+
+// app/actions/websitesActions.ts
+
+// Update website settings
+export const updateWebsiteAction = async (
+  websiteId: string,
+  updates: {
+    name?: string;
+    description?: string;
+    domain?: string;
+  }
+) => {
+  const supabase = await createClient();
+
+  try {
+    console.log('🔄 Updating website:', websiteId, updates);
+
+    const { data, error } = await supabase
+      .from('websites')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', websiteId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ Error updating website:', error);
+      throw error;
+    }
+
+    console.log('✅ Website updated successfully:', data);
+    return data;
+    
+  } catch (error) {
+    console.error('❌ Error updating website:', error);
+    throw error;
+  }
+};
