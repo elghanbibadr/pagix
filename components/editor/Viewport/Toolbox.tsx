@@ -45,7 +45,7 @@ export const Toolbox = () => {
   return (
     <ToolboxDiv
       $enabled={enabled && enabled}
-      className="toolbox transition w-12 h-full flex flex-col bg-white"
+      className="toolbox transition w-14 h-full flex flex-col bg-white"
     >
       <div className="flex flex-1 flex-col items-center pt-3 gap-3">
         <div

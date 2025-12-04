@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Toolbox } from './Toolbox';
+import { useLocale } from 'next-intl';
 
 export const Viewport: React.FC<{ children?: React.ReactNode }> = ({
   children,
@@ -16,6 +17,9 @@ export const Viewport: React.FC<{ children?: React.ReactNode }> = ({
   } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
+
+    const locale = useLocale()
+   
 
   useEffect(() => {
     if (!window) {
@@ -40,11 +44,12 @@ export const Viewport: React.FC<{ children?: React.ReactNode }> = ({
   }, [setOptions]);
 
   return (
-    <div className="viewport">
+   <div dir={locale === 'he' ? 'rtl' : 'ltr'} className="viewport">
       <div
         className={cx(['flex h-full overflow-hidden flex-row w-full fixed'])}
       >
-        <Toolbox />
+        <Sidebar />
+
         <div className="page-container flex flex-1 h-full flex-col">
           <Header />
           <div
@@ -63,7 +68,8 @@ export const Viewport: React.FC<{ children?: React.ReactNode }> = ({
             </div>
           </div>
         </div>
-        <Sidebar />
+        <Toolbox />
+        
       </div>
     </div>
   );
