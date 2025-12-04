@@ -84,19 +84,13 @@ export const Header = () => {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  console.log('has unsaved',hasUnsavedChanges)
   const handleSave = async () => {
     try {
-      console.log('💾 Save button clicked');
       
       // Get the current editor state
       const json = query.serialize();
       
-      console.log('📝 Editor content:', {
-        type: typeof json,
-        length: typeof json === 'string' ? json.length : 'N/A',
-        currentPageId
-      });
+  
       
       // Pass content directly to saveAllChanges
       await saveAllChanges({
@@ -202,7 +196,6 @@ export const Header = () => {
     }
   };
 
-  console.log('current page id',currentPageId)
 
   
   

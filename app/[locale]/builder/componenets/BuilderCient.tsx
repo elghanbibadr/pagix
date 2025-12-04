@@ -74,7 +74,6 @@ const EditorWrapper: React.FC = () => {
     
     // ✅ Skip if not initialized yet
     if (!isInitializedRef.current) {
-      console.log('⏭️ Skipping - not initialized yet');
       previousStateRef.current = currentSerialized;
       isInitializedRef.current = true;
       return;
@@ -82,7 +81,6 @@ const EditorWrapper: React.FC = () => {
 
     // ✅ Compare with previous state
     if (currentSerialized !== previousStateRef.current) {
-      console.log('✏️ Content changed - marking as unsaved');
       setHasUnsavedChanges(true);
       previousStateRef.current = currentSerialized;
     } else {
@@ -93,7 +91,6 @@ const EditorWrapper: React.FC = () => {
   // ✅ Reset when page changes
   useEffect(() => {
     if (previousPageIdRef.current !== currentPageId) {
-      console.log('🔄 Page switched, resetting state tracking');
       
       // Reset unsaved changes
       setHasUnsavedChanges(false);
@@ -115,7 +112,6 @@ const EditorWrapper: React.FC = () => {
   // ✅ Reset on initial mount
   useEffect(() => {
     isInitializedRef.current = false;
-    console.log('🎬 Initial mount - will capture baseline on first change');
   }, []);
 
   if (isLoading) {
@@ -174,10 +170,7 @@ export default function BuilderClient({
   initialPages,
   websiteId,
 }: BuilderClientProps) {
-  console.log('🎨 BuilderClient initialized with:', {
-    websiteName: initialWebsite.name,
-    pagesCount: initialPages.length,
-  });
+
 
   return (
     <ThemeProvider theme={theme}>

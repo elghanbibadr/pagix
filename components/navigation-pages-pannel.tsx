@@ -59,6 +59,14 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
 
   // ✅ Save current page content before adding new page
   const handleAddPage = () => {
+    // CHECKING IF A PAGE WITH SAME NAME EXISTS
+    const isExists=pages.some(page => page.name===newPageName)
+    if(isExists){
+      toast.error('page with similar name exists !')
+      setNewPageName('')
+      return
+    }
+    console.log("current pages",pages)
     if (newPageName.trim()) {
       // Save current page content before creating new page
       const editorStateJson = query.serialize();
@@ -266,7 +274,7 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Page?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold">"{pageToDelete?.name}"</span>? 
+              Are you sure you want to delete <span className="font-semibold">&quot;{pageToDelete?.name}&quot;</span>? 
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
