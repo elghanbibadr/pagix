@@ -69,7 +69,7 @@ export default function PageCard({ title, date, status, website_id }: PageCardPr
               onClick={() => setShowDeleteDialog(true)}
               className="p-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
@@ -119,6 +119,7 @@ export default function PageCard({ title, date, status, website_id }: PageCardPr
             <Button
               onClick={handleDelete}
               disabled={isDeleting}
+              
               variant="destructive"
             >
               {isDeleting ? (
@@ -130,7 +131,10 @@ export default function PageCard({ title, date, status, website_id }: PageCardPr
                   Deleting...
                 </>
               ) : (
-                'Delete'
+                 <>
+                  <Trash2 className='text-white' />
+                   <span className='text-white'>Delete Page...</span>
+                 </>
               )}
             </Button>
           </AlertDialogFooter>
