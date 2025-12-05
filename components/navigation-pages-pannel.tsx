@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePages } from '@/contexts/PageContext';
-import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Home } from 'lucide-react';
 import { useEditor } from '@craftjs/core';
 import {
   AlertDialog,
@@ -222,19 +222,20 @@ export const PageNavigationPanel: React.FC<PageNavigationPanelProps> = ({
                     onClick={() => handleSwitching(page.id)}
                     className="flex-1 min-w-0"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700 truncate">
-                        {page.name}
-                      </span>
-                      {page.is_home_page && (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                          Home
-                        </span>
+                    <div className="flex items-center gap-1">
+                           {page.is_home_page && (
+
+                          <Home height={15} />
                       )}
+                     <span className="text-xs font-medium text-gray-700 truncate">
+  {!page.is_home_page && <span>/ </span>}
+  {page.name}
+</span>
+                 
                     </div>
-                    <span className="text-xs text-gray-500">
+                    {/* <span className="text-xs text-gray-500">
                       {page.slug}
-                    </span>
+                    </span> */}
                   </div>
 
                   {/* Action Buttons */}

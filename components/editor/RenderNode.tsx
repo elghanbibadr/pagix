@@ -43,7 +43,7 @@ const Btn = styled.a`
 // components/editor/RenderNode.tsx
 
 // ✅ Update the getBorderConfig function
-const getBorderConfig = (isRoot: boolean, displayName: string, depth: number) => {
+const getBorderConfig = (isRoot: boolean, displayName: string, _depth: number) => {
   // Root container (App) - Green border
   if (isRoot) {
     return {
