@@ -6,6 +6,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { addPageAction, deletePageAction, updatePageContentAction } from '@/app/actions/websitesActions';
+import { toast } from 'sonner';
 
 interface Page {
   id: string;
@@ -48,6 +49,7 @@ interface PageContextType {
   currentPageId: string;
   currentPage: Page | undefined;
   isPreviewMode: boolean;
+  websiteId:string;
   isLoading: boolean;
   pendingChanges:any,
   isSaving: boolean;
@@ -71,7 +73,7 @@ export const PageProvider: React.FC<{
   websiteId?: string;
   initialWebsite?: Website;
   initialPages?: Page[];
-}> = ({ children, initialWebsite, initialPages }) => {
+}> = ({ children, initialWebsite, initialPages,websiteId }) => {
   const [website, setWebsite] = useState<Website | null>(initialWebsite || null);
   const [pages, setPages] = useState<Page[]>(initialPages || []);
   const [isLoading, setIsLoading] = useState(!initialWebsite);
@@ -84,51 +86,38 @@ export const PageProvider: React.FC<{
 
   console.log('has unsaved',hasUnsavedChanges)
   
+console.log("website id",websiteId)
 
+// contexts/PageContext.tsx
 
-
-  // ✅ Use empty string "" as default content
-  const addPage = useCallback((name: string) => {
-    if (!website) {
-      console.error('No website loaded');
-      return;
+const addPage = useCallback(async (name: string) => {
+  const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  
+  try {
+    // ✅ Save to database immediately
+    const result = await addPageAction(name, websiteId, slug, "");
+    
+    if (!result.success) {
+      toast.error(result.error || 'Failed to create page');
+      return null;
     }
 
-    const tempId = `temp_${crypto.randomUUID()}`;
-    const now = new Date().toISOString();
-    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    
-    const newPage: Page = {
-      id: tempId,
-      website_id: website.id,
-      name,
-      slug,
-      content: "", // ✅ Empty string for blank page
-      is_home_page: false,
-      is_published: false,
-      meta_title: undefined,
-      meta_description: undefined,
-      order_index: pages.length,
-      created_at: now,
-      updated_at: now,
-    };
+    const newPage = result.data;
 
+    // ✅ Add to local state with real ID from database
+    setPages((prev) => [...prev, newPage]);
+    setCurrentPageId(newPage.id);
 
-    setPages(prev => [...prev, newPage]);
+    console.log('✅ Page created and saved to database:', newPage);
     
-    setPendingChanges(prev => {
-      const updated = new Map(prev);
-      updated.set(tempId, {
-        type: 'created',
-        pageId: tempId,
-        data: newPage,
-      });
-      return updated;
-    });
+    return newPage;
     
-    setCurrentPageId(tempId);
-    
-  }, [website]);
+  } catch (error) {
+    console.error('❌ Error creating page:', error);
+    toast.error('Failed to create page. Please try again.');
+    return null;
+  }
+}, [websiteId]);
 
   const deletePage = useCallback((id: string) => {
     if (!website) return;
@@ -289,8 +278,7 @@ const updatePageContent = useCallback((id: string, content: any) => {
       }
     }
   }, [pages, isPreviewMode]);
-
-  const saveAllChanges = useCallback(async (currentEditorContent?: { pageId: string; content: any }) => {
+const saveAllChanges = useCallback(async (currentEditorContent?: { pageId: string; content: any }) => {
   console.log('🚀 saveAllChanges called');
   console.log('currentEditorContent:', currentEditorContent);
   
@@ -413,22 +401,31 @@ const updatePageContent = useCallback((id: string, content: any) => {
         preview: typeof contentToSave === 'string' ? contentToSave.substring(0, 100) : String(contentToSave).substring(0, 100)
       });
 
-      // Create the page
-      const newPage = await addPageAction(
+      // ✅ Create the page and handle the response properly
+      const result = await addPageAction(
         change.data.name!,
         change.data.website_id!,
         change.data.slug!,
         contentToSave
       );
+
+      // ✅ Check if creation was successful
+      if (!result.success || !result.data) {
+        console.error('❌ Failed to create page:', result.error);
+        throw new Error(result.error || 'Failed to create page');
+      }
+
+      const newPage = result.data; // ✅ Extract the actual page from result
       
       console.log('✅ Page created with ID:', newPage.id);
       
       idMappings.set(change.pageId, newPage.id);
       
+      // ✅ Update pages with the new page data
       setPages(prev => 
         prev.map(p => 
           p.id === change.pageId 
-            ? { ...newPage, content: contentToSave } 
+            ? { ...newPage, content: contentToSave } // ✅ Now newPage is a Page type
             : p
         )
       );
@@ -485,20 +482,20 @@ const updatePageContent = useCallback((id: string, content: any) => {
           break;
 
         case 'deleted':
-  console.log('🗑️ Deleting page:', realPageId);
-  
-  if (!realPageId.startsWith('temp_')) {
-    await deletePageAction(realPageId); 
-    console.log('✅ Page deleted from database');
-  } else {
-    console.log('⏭️ Skipping delete for temp page (never created)');
-  }
-  break;
-
+          console.log('🗑️ Deleting page:', realPageId);
+          
+          if (!realPageId.startsWith('temp_')) {
+            await deletePageAction(realPageId); 
+            console.log('✅ Page deleted from database');
+          } else {
+            console.log('⏭️ Skipping delete for temp page (never created)');
+          }
+          break;
       }
     }
 
     setPendingChanges(new Map());
+    setHasUnsavedChanges(false); // ✅ Clear unsaved changes flag
     console.log('✅ All changes saved successfully');
     
   } catch (error) {
@@ -527,6 +524,7 @@ const updatePageContent = useCallback((id: string, content: any) => {
         addPage,
         deletePage,
         renamePage,
+        websiteId,
         switchPage,
         updatePageContent,
         saveAllChanges,

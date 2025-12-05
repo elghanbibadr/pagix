@@ -16,12 +16,12 @@ export default async function BuilderPage({
   const params = await searchParams;
   const websiteId = params.websiteId as string | undefined;
 
+
     console.log('website id',websiteId)
  const websites=await loadWebsite(websiteId)
  const pages=await getPagesByWebsiteId(websiteId)
 
- console.log('pages',pages)
-//  const pages=await loadweb(websiteId)
+
 
   // Pass data to client component
   return (

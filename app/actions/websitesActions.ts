@@ -205,53 +205,98 @@ const savePageContent = async (id: string, content: JSON) => {
 
 
 // ADD NEW PAGE
+// app/actions/websitesActions.ts
+
 export const addPageAction = async (
-  name: string, 
-  websiteId: string, 
-  slug: string, 
+  name: string,
+  websiteId: string,
+  slug: string,
   content: any = ""
 ) => {
   const supabase = await createClient();
 
-  console.log('📄 addPageAction called with:', { 
-    name, 
-    slug, 
-    contentType: typeof content,
-    contentLength: typeof content === 'string' ? content.length : 'N/A',
-    isEmpty: content === "",
-    contentPreview: typeof content === 'string' ? content.substring(0, 150) : JSON.stringify(content).substring(0, 150)
-  });
-
   try {
-    const { data, error } = await supabase
+    console.log('📄 Creating page:', { name, websiteId, slug });
+
+    // ✅ Check if a page with this name already exists
+    const { data: existingPage, error: checkError } = await supabase
+      .from('pages')
+      .select('id, name')
+      .eq('website_id', websiteId)
+      .eq('name', name)
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw checkError;
+    }
+
+    if (existingPage) {
+      console.log('❌ Page with this name already exists:', existingPage);
+      return {
+        success: false,
+        error: `A page named "${name}" already exists. Please choose a different name.`,
+      };
+    }
+
+    // ✅ Check slug
+    const { data: existingSlug, error: slugCheckError } = await supabase
+      .from('pages')
+      .select('id, slug')
+      .eq('website_id', websiteId)
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (slugCheckError && slugCheckError.code !== 'PGRST116') {
+      throw slugCheckError;
+    }
+
+    if (existingSlug) {
+      console.log('❌ Page with this slug already exists:', existingSlug);
+      return {
+        success: false,
+        error: `A page with URL "${slug}" already exists. Please choose a different name.`,
+      };
+    }
+
+    // Get the highest order_index
+    const { data: pages } = await supabase
+      .from('pages')
+      .select('order_index')
+      .eq('website_id', websiteId)
+      .order('order_index', { ascending: false })
+      .limit(1);
+
+    const nextOrderIndex = pages && pages.length > 0 ? (pages[0].order_index || 0) + 1 : 0;
+
+    // ✅ Create the page
+    const { data: newPage, error: insertError } = await supabase
       .from('pages')
       .insert({
         website_id: websiteId,
-        name,
+        name: name,
         slug: slug,
         content: content,
         is_home_page: false,
-        is_published: false,
-        order_index: 0,
+        order_index: nextOrderIndex,
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (insertError) throw insertError;
 
-    console.log('✅ Page created in database:', {
-      id: data.id,
-      name: data.name,
-      contentType: typeof data.content,
-      contentLength: typeof data.content === 'string' ? data.content.length : 'N/A',
-      contentPreview: typeof data.content === 'string' ? data.content.substring(0, 150) : JSON.stringify(data.content).substring(0, 150)
-    });
+    console.log('✅ Page created successfully:', newPage);
     
-    return data;
+    return {
+      success: true,
+      data: newPage,
+    };
     
   } catch (error) {
-    console.error('❌ Error adding page:', error);
-    throw error;
+    console.error('❌ Error creating page:', error);
+    return {
+      success: false,
+      error: 'Failed to create page. Please try again.',
+    };
   }
 };
 

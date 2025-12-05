@@ -63,7 +63,7 @@ export const Viewport: React.FC<{ children?: React.ReactNode }> = ({
               connectors.select(connectors.hover(ref, null), null);
             }}
           >
-            <div className="relative flex-col flex items-center pt-8">
+            <div className="relative flex-col flex items-center m-6 pt-8">
               {children}
             </div>
           </div>

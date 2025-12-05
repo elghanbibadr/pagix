@@ -40,14 +40,16 @@ const Btn = styled.a`
   }
 `;
 
-// ✅ Helper function to determine border color based on element type and depth
-const getBorderConfig = (isRoot: boolean, displayName: string, _depth: number) => {
+// components/editor/RenderNode.tsx
+
+// ✅ Update the getBorderConfig function
+const getBorderConfig = (isRoot: boolean, displayName: string, depth: number) => {
   // Root container (App) - Green border
   if (isRoot) {
     return {
       color: '#22c55e', // green-500
-      width: '3px',
-      style: 'solid'
+      width: '2px',
+      style: 'solid' // ✅ Change to 'solid' instead of 'dashed' or 'dotted'
     };
   }
   
@@ -56,7 +58,7 @@ const getBorderConfig = (isRoot: boolean, displayName: string, _depth: number) =
     return {
       color: '#f97316', // orange-500
       width: '2px',
-      style: 'solid'
+      style: 'solid' // ✅ Solid border
     };
   }
   
@@ -64,9 +66,11 @@ const getBorderConfig = (isRoot: boolean, displayName: string, _depth: number) =
   return {
     color: '#3b82f6', // blue-500
     width: '2px',
-    style: 'solid'
+    style: 'solid' // ✅ Solid border
   };
 };
+
+// In the useEffect where you apply the border/outline
 
 export const RenderNode = ({ render }: any) => {
   const { id } = useNode();
@@ -93,6 +97,20 @@ export const RenderNode = ({ render }: any) => {
   }));
 
   const currentRef = useRef<any>(null);
+  useEffect(() => {
+  if (dom) {
+    if (isActive || isHover) {
+      const borderConfig = getBorderConfig(id === ROOT_NODE, name, 0);
+      
+      // ✅ Use outline with solid style
+      dom.style.outline = `${borderConfig.width} ${borderConfig.style} ${borderConfig.color}`;
+      dom.style.outlineOffset = '0px';
+    } else {
+      dom.style.outline = '';
+      dom.style.outlineOffset = '';
+    }
+  }
+}, [isActive, isHover, dom, id, name]);
 
 useEffect(() => {
   if (dom) {

@@ -77,7 +77,7 @@ export const Header = () => {
   }));
    const openSettings = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleSave()
+    // handleSave()
     const params = new URLSearchParams(searchParams.toString());
     params.set('view', 'settings');
     params.set('pageId', currentPageId);
@@ -278,7 +278,7 @@ export const Header = () => {
             )}
             
             {/* Finish Editing / Edit Button */}
-            {/* <Btn
+            <Btn
               className={cx([
                 'transition cursor-pointer',
                 {
@@ -296,7 +296,7 @@ export const Header = () => {
                     width={12}
                     height={12}
                   />
-                  Finish Editing
+                  Preview
                 </>
               ) : (
                 <>
@@ -310,11 +310,11 @@ export const Header = () => {
                 </>
               )}
             </Btn>
-             */}
-            <Btn onClick={handlePreview} className='bg-black cursor-pointer text-white'>
+             
+            {/* <Btn onClick={handleFinishEditing} className='bg-black cursor-pointer text-white'>
               Preview
             </Btn>
-            
+             */}
             {/* Back to Dashboard Button */}
             <Button className='text-black' onClick={handleBackToDashboard} variant="outline">
               Back to Dashboard

@@ -40,10 +40,10 @@ const EditorContent = ({ pageContent }: { pageContent: any }) => {
       <Element
         canvas
         is={Container}
-        width="100%"
+        width="900px"
         height="auto"
         background={{ r: 255, g: 255, b: 255, a: 1 }}
-        padding={['10', '40', '40', '40']}
+        padding={['40', '40', '40', '40']}
         custom={{ displayName: 'App' }}
      />
       {/* </Element> */}
@@ -143,7 +143,7 @@ const EditorWrapper: React.FC = () => {
       
       {/* Editor */}
       {!showSettings && (
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 ">
           <Editor
             onNodesChange={handleNodesChange} // ✅ Pass query object
             resolver={{
